@@ -202,7 +202,7 @@ inicio_2 <- seq(from = 6,to = 254,by = 10)
 
 fin_2 <- rep(254,25)
 
-map2(.x = inicio_3, 
-     .y = fin_3, 
+map2(.x = inicio_2, 
+     .y = fin_2, 
      .f = secciones_cepal, path = "tablas_crudas/gasto_social_cepal_18102021.xlsx")
   
