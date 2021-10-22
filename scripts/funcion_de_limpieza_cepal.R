@@ -200,7 +200,7 @@ ejemplo4
 
 inicio_2 <- seq(from = 6,to = 254,by = 10)
 
-fin_2 <- rep(254,25)
+fin_2 <- seq(from = 14,to = 254,by = 10)
 
 indi_gst_social <- map2(.x = inicio_2, 
      .y = fin_2, 
