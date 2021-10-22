@@ -202,7 +202,21 @@ inicio_2 <- seq(from = 6,to = 254,by = 10)
 
 fin_2 <- rep(254,25)
 
-map2(.x = inicio_2, 
+indi_gst_social <- map2(.x = inicio_2, 
      .y = fin_2, 
-     .f = secciones_cepal, path = "tablas_crudas/gasto_social_cepal_18102021.xlsx")
+     .f = secciones_cepal, path = "tablas_crudas/gasto_social_cepal_18102021.xlsx") %>% 
+  reduce(bind_rows) 
+
+
+
+# Guardado ----------------------------------------------------------------
+
+
+# Guardar la base en formato comprimido y "gz" es para comprimir más pero
+# manteniendo la calidad
+
+write_rds(x = indi_gst_social, 
+          file = "tablas_intermedias/gasto_social_cepal.rds", compress = "gz")
+
+
   
