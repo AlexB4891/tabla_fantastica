@@ -50,8 +50,12 @@ tabla_final <- tabla_final %>%
   )
  
 
- # tabla_final_tidy <- tabla_final_tidy %>% 
- #    select(nombre_del_presidente, inicio, fin, Procedencia)
+# Base Ecuador ------------------------------------------------------------
+ 
+ Ecuador <- tabla_final_tidy %>%
+    select(nombre_del_presidente, inicio, fin)
+ 
+ Ecuador %>% filter()
 
  
  # Funciones auxiliares que no se usaron
@@ -82,8 +86,8 @@ extraer_tabla_presidentes <- function(url, posicion_tabla){
 }
 
 
-a <- extraer_tabla_presidentes(url = "https://es.wikipedia.org/wiki/Anexo:Presidentes_del_Ecuador", 
-                          posicion_tabla = 2)
+# a <- extraer_tabla_presidentes(url = "https://es.wikipedia.org/wiki/Anexo:Presidentes_del_Ecuador", 
+#                           posicion_tabla = 2)
 
 
 # Obteniendo la base bruta de cada país -----------------------------------
@@ -133,4 +137,16 @@ bases <- map2(.x = urls,.y = posiciones,.f = extraer_tabla_presidentes)
 # extraer_tabla_presidentes(url = "https://es.wikipedia.org/wiki/Anexo:Gobernadores_de_las_Bahamas", 
 #                           posicion_tabla = 20) %>% View
 
+
+
+# Base Argentina ----------------------------------------------------------
+
+Argentina <- bases[[1]]
+
+Argentina <- Argentina %>% select(-c(1,2,10))
+
+Argentina <- Argentina %>% mutate(
+  Presidente = str_remove(string = `Presidente de la Nación`,pattern = "\\(.*|[:digit:].*"))
+ 
+Argentina <- Argentina %>% mutate(inicio=  parse_date(`Inicio del mandato`, "%d %B %Y",locale=locale("es")) )
 
