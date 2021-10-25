@@ -147,6 +147,87 @@ Argentina <- Argentina %>% select(-c(1,2,10))
 
 Argentina <- Argentina %>% mutate(
   Presidente = str_remove(string = `Presidente de la Nación`,pattern = "\\(.*|[:digit:].*"))
+
+operacion_fechas <- function(base,variables,formato){
+  
+  base <-
+    base %>% mutate(
+      # inicio=  parse_date(`Inicio del mandato`, "%d %B %Y",locale=locale("es")) 
+      
+      across(.cols = variables,
+             .fns = ~ str_remove(string = .x,pattern = "\\[.+]")),
+      across(.cols = variables,
+             .fns = ~ str_remove_all(string = .x,pattern = "de[:space:]")),
+      across(.cols = variables,
+             .fns = ~ str_trim(string = .x,side = "both")),
+      across(.cols = variables,
+             .fns = ~ str_squish(string = .x)),
+      across(.cols = variables,
+             .fns = ~ str_remove_all(string = .x,pattern = "\u200b")),
+      across(.cols = variables,
+             .fns = ~ parse_date(.x,formato,locale=locale("es")))
+      
+    )  
+  
+  return(base)
+}
  
-Argentina <- Argentina %>% mutate(inicio=  parse_date(`Inicio del mandato`, "%d %B %Y",locale=locale("es")) )
+
+
+operacion_fechas(base = Argentina,variables = c("Inicio del mandato","Fin del mandato"),formato = "%d %B %Y") %>% 
+    select(matches("Inicio "),matches("Fin ")) 
+
+    
+
+Bolivia <- bases[[2]]
+
+Bolivia <- Bolivia %>% 
+  select(-c(1:3)) %>% 
+  mutate(across(.cols = c(Inicio, Final),
+                ~ str_extract_all(.x,".*[:digit:]{4}")),
+         across(.cols = c(Inicio, Final),
+                ~ str_remove_all(.x,".*\\,")),
+         across(.cols = c(Inicio, Final),
+                ~ str_remove_all(.x,"\\.")))
+
+
+completar_meses <- function(variable){
+  
+  var_low <- str_to_title(variable) 
+  
+  
+  variable_mod <- case_when(
+      str_detect(var_low,"Ene") ~ str_replace_all(var_low,"Ene","Enero"),
+      str_detect(var_low,"Feb") ~ str_replace_all(var_low,"Feb","Febrero"),
+      str_detect(var_low,"Mar") ~ str_replace_all(var_low,"Mar","Marzo"),
+      str_detect(var_low,"Abr") ~ str_replace_all(var_low,"Abr","Abril"),
+      str_detect(var_low,"May") ~ str_replace_all(var_low,"May","Mayo"),
+      str_detect(var_low,"Jun") ~ str_replace_all(var_low,"Jun","Junio"),
+      str_detect(var_low,"Jul") ~ str_replace_all(var_low,"Jul","Julio"),
+      str_detect(var_low,"Ago") ~ str_replace_all(var_low,"Ago","Agosto"),
+      str_detect(var_low,"Sep") ~ str_replace_all(var_low,"Sep","Septiembre"),
+      str_detect(var_low,"Oct") ~ str_replace_all(var_low,"Oct","Octubre"),
+      str_detect(var_low,"Nov") ~ str_replace_all(var_low,"Nov","Noviembre"),
+      str_detect(var_low,"Dic") ~ str_replace_all(var_low,"Dic","Diciembre")
+    
+  )
+  
+  variable_mod <- str_to_lower(variable_mod)
+  
+  return(variable_mod)
+  
+}
+
+Bolivia <- Bolivia %>% 
+  rowwise() %>% 
+  mutate( across(.cols = c(Inicio, Final),
+                           ~ completar_meses(.x))) %>% 
+  ungroup()
+
+Bolivia <- operacion_fechas(base = Bolivia,variables = c("Inicio", "Final"),formato = "%d %B %Y" ) 
+
+
+
+Bolivia %>% 
+  filter(year(Inicio) > 1990)
 
