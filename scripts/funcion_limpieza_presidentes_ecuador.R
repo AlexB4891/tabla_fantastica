@@ -59,6 +59,22 @@ tabla_final <- tabla_final %>%
    filter(year(inicio) >= 1998) %>% View()
 
  
+ # 1. Sacar el año de la fecha de inicio
+ # 2. Hacer un join con los datos del gasto social
+ # 3. Pasar la funcion del grafico 
+ # Hay que conpletar las series de tiempó
+ 
+ data_year <- tibble(year = 1990:2021) 
+ 
+ tibble(year = c(2006,2010,2015,2021),
+        valor = rnorm(4)) %>% 
+   right_join(data_year) %>% 
+   arrange(year) %>% 
+   fill(valor,.direction = "down") %>% 
+   ggplot(mapping = aes(x = year,y = valor)) +
+   geom_line()
+ # 
+ 
  # Funciones auxiliares que no se usaron
 # class(tabla_final_tidy$edad)
 # class(tabla_final_tidy$periodo_presidencia)
@@ -322,6 +338,8 @@ names(Costa_Rica)[c(2,3,4,5)] <- c("temporal",
                                    "fin")
 
 
+
+
 # Base Cuba ---------------------------------------------------------------
 
 Cuba <- bases[[7]]
@@ -471,7 +489,7 @@ Paraguay <- Paraguay %>% select(c(3,4))
 
 # Base Peru ---------------------------------------------------------------
 
-Peru <- bases[[16]]
+  Peru <- bases[[16]]
 
 names(Peru)
 
@@ -486,7 +504,9 @@ Peru <-  Peru %>% rename(inicio = `Inicio del mandato`,
 
 Peru <-  Peru %>% filter(year(inicio) >= 1995) 
 
-Peru <-  Peru %>% mutate(nombre_del_presidente = str_remove(string = Presidente,pattern = "\\[.*")) 
+Peru <-  Peru %>% mutate(nombre_del_presidente = str_remove(string = Presidente,pattern = "\\[.*") %>% 
+                           str_trim()) %>% 
+  select(-Presidente)
 
 # Paises ------------------------------------------------------------------
 

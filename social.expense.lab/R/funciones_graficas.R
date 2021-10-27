@@ -52,3 +52,6 @@ serie_de_tiempo_resaltada <- function(datos,
   
   return(resultado)
 }
+
+
+
