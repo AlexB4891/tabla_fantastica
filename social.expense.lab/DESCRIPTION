@@ -1,13 +1,9 @@
 Package: social.expense.lab
-Title: An Amazing Shiny App
+Title: Laboratorio de análisis del gasto social
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "firstname",
-           family = "lastname",
-           role = c("aut", "cre"),
-           email = "your@email.com")
-Description: What the package does (one paragraph).
-License: What license is it under?
+Authors@R: person('Alex', 'Bajaña', email = 'alexb.inf.4891@gmail.com', role = c('cre', 'aut'))
+Description: Gasto público social según clasificación por funciones del gobierno (por habitante en dólares a precios constantes).
+License: MIT + file LICENSE
 Imports: 
     config (>= 0.3.1),
     golem (>= 0.3.1),
