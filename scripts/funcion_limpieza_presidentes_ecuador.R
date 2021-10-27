@@ -316,11 +316,10 @@ Colombia <- Colombia %>% mutate(periodo_presidencia = str_split(string = Períod
 
 Costa_Rica <- bases[[6]]
 
-names(Costa_Rica)
-
-Costa_Rica <- Costa_Rica %>% select(-c(2)) %>% rename(inicio = "Periodo en el cargoDuración en años, meses y días", 
-                                                      fin= "Periodo en el cargoDuración en años, meses y días")
-
+names(Costa_Rica)[c(2,3,4,5)] <- c("temporal",
+                                   "nombre_presidente",
+                                   "inicio", 
+                                   "fin")
 
 
 # Base Cuba ---------------------------------------------------------------
