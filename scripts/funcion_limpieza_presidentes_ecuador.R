@@ -55,7 +55,8 @@ tabla_final <- tabla_final %>%
  Ecuador <- tabla_final_tidy %>%
     select(nombre_del_presidente, inicio, fin)
  
- Ecuador %>% filter()
+ Ecuador <- Ecuador %>%
+   filter(year(inicio) >= 1998) %>% View()
 
  
  # Funciones auxiliares que no se usaron
@@ -139,14 +140,9 @@ bases <- map2(.x = urls,.y = posiciones,.f = extraer_tabla_presidentes)
 
 
 
-# Base Argentina ----------------------------------------------------------
 
-Argentina <- bases[[1]]
+# Fechas formato: "25 de agosto de 2021" -----------------------------------
 
-Argentina <- Argentina %>% select(-c(1,2,10))
-
-Argentina <- Argentina %>% mutate(
-  Presidente = str_remove(string = `Presidente de la Nación`,pattern = "\\(.*|[:digit:].*"))
 
 operacion_fechas <- function(base,variables,formato){
   
@@ -155,15 +151,15 @@ operacion_fechas <- function(base,variables,formato){
       # inicio=  parse_date(`Inicio del mandato`, "%d %B %Y",locale=locale("es")) 
       
       across(.cols = variables,
-             .fns = ~ str_remove(string = .x,pattern = "\\[.+]")),
+             .fns = ~ str_remove(string = .x, pattern = "\\[.+]")),
       across(.cols = variables,
-             .fns = ~ str_remove_all(string = .x,pattern = "de[:space:]")),
+             .fns = ~ str_remove_all(string = .x, pattern = "de[:space:]")),
       across(.cols = variables,
-             .fns = ~ str_trim(string = .x,side = "both")),
+             .fns = ~ str_trim(string = .x, side = "both")),
       across(.cols = variables,
              .fns = ~ str_squish(string = .x)),
       across(.cols = variables,
-             .fns = ~ str_remove_all(string = .x,pattern = "\u200b")),
+             .fns = ~ str_remove_all(string = .x, pattern = "\u200b")),
       across(.cols = variables,
              .fns = ~ parse_date(.x,formato,locale=locale("es")))
       
@@ -174,27 +170,29 @@ operacion_fechas <- function(base,variables,formato){
  
 
 
-operacion_fechas(base = Argentina,variables = c("Inicio del mandato","Fin del mandato"),formato = "%d %B %Y") %>% 
-    select(matches("Inicio "),matches("Fin ")) 
+# Base Argentina ----------------------------------------------------------
 
-    
+Argentina <- bases[[1]]
 
-Bolivia <- bases[[2]]
+Argentina <- Argentina %>% select(-c(1,2,10))
 
-Bolivia <- Bolivia %>% 
-  select(-c(1:3)) %>% 
-  mutate(across(.cols = c(Inicio, Final),
-                ~ str_extract_all(.x,".*[:digit:]{4}")),
-         across(.cols = c(Inicio, Final),
-                ~ str_remove_all(.x,".*\\,")),
-         across(.cols = c(Inicio, Final),
-                ~ str_remove_all(.x,"\\.")))
+Argentina <- Argentina %>% mutate(
+  nombre_del_presidente = str_remove(string = `Presidente de la Nación`,pattern = "\\(.*|[:digit:].*"))
 
+Argentina <- operacion_fechas(base = Argentina, 
+                 variables = c("Inicio del mandato","Fin del mandato"), 
+                 formato = "%d %B %Y") 
+
+Argentina <- Argentina %>% mutate(inicio= `Inicio del mandato`, fin= `Fin del mandato`) %>% 
+  select(nombre_del_presidente, inicio, fin) %>%
+  filter(year(inicio) >= 1998) 
+
+
+# Funcion para completar los nombres de los meses del año -----------------
 
 completar_meses <- function(variable){
   
   var_low <- str_to_title(variable) 
-  
   
   variable_mod <- case_when(
       str_detect(var_low,"Ene") ~ str_replace_all(var_low,"Ene","Enero"),
@@ -218,6 +216,27 @@ completar_meses <- function(variable){
   
 }
 
+
+# Base Bolivia ------------------------------------------------------------
+
+Bolivia <- bases[[2]]
+
+Bolivia <- Bolivia %>% 
+  select(-c(1:3))
+
+Bolivia <- Bolivia %>% mutate(
+  nombre_del_presidente = str_remove(string = Presidente, 
+                                     pattern = "\\(.*|[:digit:].*|\\[.*"))
+
+
+Bolivia <- Bolivia  %>% 
+  mutate(across(.cols = c(Inicio, Final),
+                ~ str_extract_all(.x,".*[:digit:]{4}")),
+         across(.cols = c(Inicio, Final),
+                ~ str_remove_all(.x,".*\\,")),
+         across(.cols = c(Inicio, Final),
+                ~ str_remove_all(.x,"\\.")))
+
 Bolivia <- Bolivia %>% 
   rowwise() %>% 
   mutate( across(.cols = c(Inicio, Final),
@@ -226,8 +245,260 @@ Bolivia <- Bolivia %>%
 
 Bolivia <- operacion_fechas(base = Bolivia,variables = c("Inicio", "Final"),formato = "%d %B %Y" ) 
 
+Bolivia <- Bolivia %>% mutate(inicio = Inicio, fin = Final) %>% 
+  select(nombre_del_presidente, inicio, fin) %>%
+  filter(year(inicio) >= 1997) 
 
 
-Bolivia %>% 
-  filter(year(Inicio) > 1990)
+
+# Base Brasil -------------------------------------------------------------
+
+Brasil <- bases[[3]]
+
+Brasil <- Brasil %>% select(-c(3:4))
+
+Brasil <- operacion_fechas(base = Brasil, 
+                 variables = c("Inicio del mandato", "Fin del mandato"), 
+                 formato = "%d %B %Y")
+
+Brasil <- Brasil %>% mutate(nombre_del_presidente = Presidente, 
+                            inicio = `Inicio del mandato`, 
+                            fin = `Fin del mandato`) %>% 
+  select(nombre_del_presidente, inicio, fin) %>%
+  filter(year(inicio) >= 1995) 
+
+
+# Base Chile --------------------------------------------------------------
+
+Chile <- bases[[4]]
+
+names(Chile)
+
+Chile <- Chile %>% select(-c(2,6,8))
+
+Chile <- operacion_fechas(base = Chile, 
+                 variables = c("Inicio del mandato", "Fin del mandato"), 
+                 formato = "%d %B %Y")
+
+Chile <- Chile %>% mutate(nombre_del_presidente = Presidente, 
+                            inicio = `Inicio del mandato`, 
+                            fin = `Fin del mandato`) %>% 
+  select(nombre_del_presidente, inicio, fin) %>%
+  filter(year(inicio) >= 1994) 
+
+
+
+# Base Colombia -----------------------------------------------------------
+
+Colombia <- bases[[5]]
+
+names(Colombia)
+
+Colombia <- Colombia %>% select(-c(1))
+
+Colombia <- Colombia %>% mutate(periodo_presidencia = str_split(string = Período,pattern = "-"),
+                    inicio = map(.x = periodo_presidencia,~.x[1]),
+                    fin = map(.x = periodo_presidencia,~.x[2]),
+                    across(.cols = c(inicio,fin),
+       .fns = ~ str_remove(string = .x,pattern = "\\[.\\]")),
+       across(.cols = c(inicio,fin),
+       .fns = ~ str_remove_all(string = .x,pattern = "de[:space:]")),
+       across(.cols = c(inicio,fin),
+       .fns = ~ parse_date(.x,"%d %B %Y",locale=locale("es"))),
+       nombre_del_presidente = str_remove(string = Presidente, 
+                                          pattern = "\\(.*|[:digit:].*")) %>% 
+  select(nombre_del_presidente, inicio, fin) %>%
+  filter(year(inicio) >= 1998) 
+
+
+
+# Base Costa Rica ---------------------------------------------------------
+
+Costa_Rica <- bases[[6]]
+
+names(Costa_Rica)
+
+Costa_Rica <- Costa_Rica %>% select(-c(2)) %>% rename(inicio = "Periodo en el cargoDuración en años, meses y días", 
+                                                      fin= "Periodo en el cargoDuración en años, meses y días")
+
+
+
+# Base Cuba ---------------------------------------------------------------
+
+Cuba <- bases[[7]]
+
+names(Cuba)
+
+Cuba <- Cuba[-1,]
+
+Cuba <- Cuba %>% rename(inicio = X5, fin = X6, nombre_del_presidente = X4) 
+
+Cuba <- operacion_fechas(base = Cuba, variables = c("inicio", "fin"), formato = "%d %B %Y")
+
+Cuba <- Cuba %>%
+  select(nombre_del_presidente, inicio, fin) 
+
+
+# Base El Salvador --------------------------------------------------------
+
+Salvador <- bases[[9]]
+
+names(Salvador)
+
+Salvador <- Salvador %>% select(-c(1,2))
+
+Salvador <- Salvador %>% mutate(nombre_del_presidente = Nombre, 
+                                periodo_presidencia = str_split(string = Período,pattern = "-"),
+                                inicio = map(.x = periodo_presidencia,~.x[1]),
+                                fin = map(.x = periodo_presidencia,~.x[2]),
+                                across(.cols = c(inicio,fin),
+                                       .fns = ~ str_remove(string = .x,pattern = "\\[.\\]")),
+                                across(.cols = c(inicio,fin),
+                                       .fns = ~ str_remove_all(string = .x,pattern = "de[:space:]")),
+                                across(.cols = c(inicio,fin),
+                                       .fns = ~ parse_date(.x,"%d %B %Y",locale=locale("es"))),
+                                # nombre_del_presidente = str_remove(string = Presidente, 
+                                #                                    pattern = "\\(.*|[:digit:].*")
+                                ) %>% 
+  select(nombre_del_presidente, inicio, fin) %>%
+  filter(year(inicio) >= 1999) 
+
+
+# Guatemala ---------------------------------------------------------------
+
+Guatemala <- bases[[10]]
+
+names(Guatemala)
+
+Guatemala <- Guatemala %>% select(-c(2,3))
+
+Guatemala <- operacion_fechas(base = Guatemala, 
+                 variables = c("Inicio del mandato", "Fin del mandato"), 
+                 formato = "%d %B %Y")
+
+Guatemala <- Guatemala %>% rename(nombre_del_presidente = Presidente, 
+                     inicio = `Inicio del mandato`,
+                     fin = `Fin del mandato`) %>% 
+  select(nombre_del_presidente, inicio, fin) 
+
+Guatemala <- Guatemala %>% filter(year(inicio) >= 1996)
+
+Guatemala <- Guatemala %>% mutate(nombre_del_presidente = str_remove(string = nombre_del_presidente,
+                                                        pattern = "\\..*|[:digit:].*"))
+
+
+
+# Base Honduras -----------------------------------------------------------
+
+Honduras <- bases[[11]]
+
+names(Honduras)
+
+Honduras <- Honduras %>% select(c(1,3,4))
+
+
+# Base México -------------------------------------------------------------
+
+Mexico <- bases[[12]]
+
+names(Mexico)
+
+Mexico <- Mexico %>% select(c(3,6))
+
+Mexico <- Mexico %>% mutate(nombre_del_presidente = Presidente, 
+                                periodo_presidencia = str_split(string = Período,pattern = "-"),
+                                inicio = map(.x = periodo_presidencia,~.x[1]),
+                                fin = map(.x = periodo_presidencia,~.x[2]),
+                                across(.cols = c(inicio,fin),
+                                       .fns = ~ str_remove(string = .x,pattern = "\\[.\\]")),
+                                across(.cols = c(inicio,fin),
+                                       .fns = ~ str_remove_all(string = .x,pattern = "de[:space:]")),
+                                across(.cols = c(inicio,fin),
+                                       .fns = ~ parse_date(.x,"%d %B %Y",locale=locale("es"))),
+                                # nombre_del_presidente = str_remove(string = Presidente, 
+                                #                                    pattern = "\\(.*|[:digit:].*")
+) %>% 
+  select(nombre_del_presidente, inicio, fin) %>%
+  filter(year(inicio) >= 1994) 
+
+
+
+# Base Nicaragua ----------------------------------------------------------
+
+Nicaragua <- bases[[13]]
+
+names(Nicaragua)
+
+Nicaragua <- Nicaragua %>% select(c(3,4))
+
+
+Nicaragua <- Nicaragua %>% mutate(periodo_presidencia = str_split(string = Mandato,pattern = "-"),
+                  inicio = map(.x = periodo_presidencia,~.x[1]),
+                  fin = map(.x = periodo_presidencia,~.x[2]),
+                  across(.cols = c(inicio,fin),
+                         .fns = ~ str_remove(string = .x,pattern = "\\[.\\]")),
+                  across(.cols = c(inicio,fin),
+                         .fns = ~ str_remove_all(string = .x,pattern = "de[:space:]")),
+                  across(.cols = c(inicio,fin),
+                         .fns = ~ parse_date(.x,"%d %B %Y",locale=locale("es"))),
+                  # nombre_del_presidente = str_remove(string = Presidente, 
+                  #                                    pattern = "\\(.*|[:digit:].*")
+) %>% 
+  select(Nombre, inicio, fin) %>%
+  filter(year(inicio) >= 1997) 
+
+Nicaragua <- Nicaragua %>% mutate(nombre_del_presidente = str_extract(string = Nombre,pattern = "[:alpha:].*")) %>% 
+  select(nombre_del_presidente, inicio, fin)
+
+
+
+# Base Panama -------------------------------------------------------------
+
+Panama <- bases[[14]]
+
+names(Panama)
+
+#Panama <- Panama %>% select(c(3,4))
+
+
+# Base Paraguay -----------------------------------------------------------
+
+Paraguay <- bases[[15]]
+
+names(Paraguay)
+
+Paraguay <- Paraguay %>% select(c(3,4))
+
+
+# Base Peru ---------------------------------------------------------------
+
+Peru <- bases[[16]]
+
+names(Peru)
+
+Peru <- Peru %>% select(c(3,5,6))
+
+Peru <- operacion_fechas(base = Peru, 
+                         variables = c("Inicio del mandato", "Fin del mandato"), 
+                         formato = "%d %B %Y") 
+
+Peru <-  Peru %>% rename(inicio = `Inicio del mandato`, 
+                         fin = `Fin del mandato`)
+
+Peru <-  Peru %>% filter(year(inicio) >= 1995) 
+
+Peru <-  Peru %>% mutate(nombre_del_presidente = str_remove(string = Presidente,pattern = "\\[.*")) 
+
+# Paises ------------------------------------------------------------------
+
+
+paises_latinoamerica <- c("Argentina", "Bolivia", "Brasil", 
+                          "Chile", "Colombia", "Costa Rica", 
+                          "Cuba", "Ecuador", "El Salvador",
+                          "Guatemala", "Honduras", "México", 
+                          "Nicaragua", "Panama", "Paraguay", 
+                          "Peru", "Puerto Rico", "Republica Dominicana", 
+                          "Uruguay", "Venezuela", "Venezuela")
+
+
 
