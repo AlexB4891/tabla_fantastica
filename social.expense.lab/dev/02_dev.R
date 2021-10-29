@@ -39,7 +39,7 @@ usethis::use_pipe()
 # Crear modulos:
 
 golem::add_module( name = "tabla_central" ) # Name of the module
-
+golem::add_module( name = "seleccion_indicador")
 # Funciones auxiliares:
 usethis::use_r("funciones_graficas")
 

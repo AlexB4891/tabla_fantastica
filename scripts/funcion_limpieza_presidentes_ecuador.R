@@ -60,6 +60,8 @@ tabla_final <- tabla_final %>%
  Ecuador <- Ecuador %>%
    filter(year(inicio) >= 1998) 
 
+ Ecuador <- Ecuador %>% 
+   mutate(pais = "Ecuador")
 
  
  # Funciones auxiliares que no se usaron
@@ -645,20 +647,43 @@ paises_base <- rbind(Argentina, Bolivia, Brasil,
 
 
 
-# UNIR paises con gasto social --------------------------------------------
+
 
 
 # Crear una nueva columna con el año de inicio y ponerla como character
 paises_base <- paises_base %>% 
   mutate(Year = year(inicio) %>% as.character())
 
+# UNIR paises con gasto social --------------------------------------------
+
+archivos_gasto <- list.files(path = "tablas_intermedias",pattern = "indicador_",full.names = T) 
+gasto_social <- archivos_gasto %>% 
+  map(read_rds)
+
 
 # Unir las dos bases por año y país, ordenar y rellenar (para abajo) con los valores faltantes
-paises_base %>% 
-  right_join(gasto_social, by = c("Year", "pais")) %>% 
-  arrange("Year") %>% 
-  fill(Indicador_valor, .direction = "down") 
 
+gasto_social_presidente <- gasto_social %>% 
+  map(~{
+
+    paises_base %>% 
+      right_join(.x, by = c("Year", "pais")) %>% 
+      arrange(pais,Year) %>% 
+      group_by(pais) %>% 
+      fill(Indicador_valor, .direction = "down") %>% 
+      filter(str_detect(Year,"[:alpha:]",negate = T))
+    
+  })
+
+walk2(.x = archivos_gasto,
+     .y = gasto_social_presidente,~{
+       
+       tabla <- .y
+       
+       ruta <- .x
+       
+       write_rds(x = tabla,file = ruta)
+     })
 
 
 

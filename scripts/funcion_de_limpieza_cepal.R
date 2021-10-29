@@ -225,38 +225,44 @@ write_rds(x = indi_gst_social,
 # Elegir solo de Gasto social y las variables de interes
 
 gasto_social <- indi_gst_social %>% 
-  filter(Funciones_gobierno =="Gasto social") %>% 
-  select(Year, Indicador_valor, Pais)
-
+  
 # Aquí se ve que todos tienen "GOBIERNO CENTRAL - "
-# split(x = gasto_social, f = gasto_social$Pais)
-
-
+  
 # Dejar solo los nombres de los paises
-gasto_social <- gasto_social %>% 
   mutate(Pais = str_remove(string = Pais, 
                            pattern = "GOBIERNO[:space:]CENTRAL[:space:]\\-[:space:]"),
          Pais = str_remove(string = Pais, pattern = "\\(.*") %>% 
-           str_trim())
-
-# Cambiar de mayúsculas a tipo oracion
-gasto_social <- gasto_social %>% mutate(Pais = stringr::str_to_title(gasto_social$Pais))
-
-
+           str_trim()) %>% 
 # Quitar las tildes y espacios para homologar la base
-gasto_social <- gasto_social %>% 
   mutate(Pais = case_when(Pais == "Costa Rica"~"Costa_Rica",
-                                                 Pais == "El Salvador"~"Salvador",
-                                                 Pais == "México" ~ "Mexico",
-                                                 Pais == "Panamá" ~ "Panama",
-                                                 Pais == "Perú" ~ "Peru",
-                                                 Pais == "República Dominicana" ~ "Republica_Dominicana",
-                                         TRUE ~ Pais)) %>% 
-  rename(pais = Pais)
-
+                          Pais == "El Salvador"~"Salvador",
+                          Pais == "México" ~ "Mexico",
+                          Pais == "Panamá" ~ "Panama",
+                          Pais == "Perú" ~ "Peru",
+                          Pais == "República Dominicana" ~ "Republica_Dominicana",
+                          TRUE ~ Pais)) %>% 
+# Cambiar de mayúsculas a tipo oracion
+  mutate(Pais = stringr::str_to_title(Pais)) %>% 
 # Convertir a número el indicador
+  mutate(Indicador_valor = as.double(Indicador_valor)) %>% 
 
-gasto_social <- gasto_social %>% mutate(Indicador_valor = as.double(Indicador_valor))
+  split(.$Funciones_gobierno) %>% 
+  map(~.x %>% 
+        select(Year, Indicador_valor, Pais,Funciones_gobierno) %>% 
+        rename(pais = Pais) )
+  
+# Guardamos los indicadores:
+
+iwalk(.x = gasto_social,~{
+  
+ ruta <-  str_replace_all(.y," ","_") %>%
+    str_to_lower() %>%
+    str_c("tablas_intermedias/indicador_",.,".rds")
+  
+ write_rds(x = .x,file = ruta)
+ 
+  })
+
 
 # Verificar los nombres
 table(gasto_social$pais)
