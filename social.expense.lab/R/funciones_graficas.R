@@ -54,3 +54,22 @@ serie_de_tiempo_resaltada <- function(datos,
 
 
 
+serie_de_tiempo_resaltada(datos = tibble(iris),
+                         variables_filtro = list(Species = "virginica"),
+                         variable_x = "Sepal.Length",
+                         variable_y = "Sepal.Width")
+
+iris2 <- iris %>% 
+  mutate(ind = sample(c("a","b"),size = nrow(.),replace = T))
+
+iris_limites <- tibble(x = 4:8) %>% 
+  mutate(x_1 = lag(x,n = 1),
+         y = c("a","b","a","b","a"))
+
+ 
+ggplot() + 
+  geom_point(data = iris,aes(Sepal.Length,Sepal.Width)) + 
+  geom_rect(data = iris_limites,
+            aes(xmin = x_1,xmax=x,ymin = -Inf,ymax = Inf,fill = y,color = y),
+                           alpha = 0.1)
+

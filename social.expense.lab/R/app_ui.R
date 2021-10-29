@@ -10,7 +10,9 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic 
     fluidPage(
-      h1("social.expense.lab")
+      h1("social.expense.lab"),
+      mod_seleccion_indicador_ui("seleccion_indicador_ui_1"),
+      mod_tabla_central_ui("tabla_central_ui_1")
     )
   )
 }

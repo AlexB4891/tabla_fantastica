@@ -10,17 +10,25 @@
 mod_tabla_central_ui <- function(id){
   ns <- NS(id)
   tagList(
- 
+   DT::DTOutput(ns("tabla"))
   )
 }
     
 #' tabla_central Server Functions
 #'
 #' @noRd 
-mod_tabla_central_server <- function(id){
+mod_tabla_central_server <- function(id,
+                                     tipo_indicador){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
  
+    
+    output$tabla <- DT::renderDT({
+      
+      readr::read_rds(tipo_indicador())
+      
+    })
+    
   })
 }
     
