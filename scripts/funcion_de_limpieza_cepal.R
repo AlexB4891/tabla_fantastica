@@ -175,25 +175,25 @@ secciones_cepal <- function(path, inicio, fin){
 # Aplicando la función ----------------------------------------------------
 
 
-ejemplo1 <- secciones_cepal(path = "tablas_crudas/gasto_social_cepal_18102021.xlsx", 
-                inicio = 6, 
-                fin = 254)
-ejemplo1
-
-ejemplo2 <- secciones_cepal(path = "tablas_crudas/gasto_social_cepal_18102021.xlsx", 
-                            inicio = 16, 
-                            fin = 254)
-ejemplo2
-
-ejemplo3 <- secciones_cepal(path = "tablas_crudas/gasto_social_cepal_18102021.xlsx", 
-                            inicio = 26, 
-                            fin = 254)
-ejemplo3
-
-ejemplo4 <- secciones_cepal(path = "tablas_crudas/gasto_social_cepal_18102021.xlsx", 
-                            inicio = 36, 
-                            fin = 254)
-ejemplo4
+# ejemplo1 <- secciones_cepal(path = "tablas_crudas/gasto_social_cepal_18102021.xlsx", 
+#                 inicio = 6, 
+#                 fin = 254)
+# ejemplo1
+# 
+# ejemplo2 <- secciones_cepal(path = "tablas_crudas/gasto_social_cepal_18102021.xlsx", 
+#                             inicio = 16, 
+#                             fin = 254)
+# ejemplo2
+# 
+# ejemplo3 <- secciones_cepal(path = "tablas_crudas/gasto_social_cepal_18102021.xlsx", 
+#                             inicio = 26, 
+#                             fin = 254)
+# ejemplo3
+# 
+# ejemplo4 <- secciones_cepal(path = "tablas_crudas/gasto_social_cepal_18102021.xlsx", 
+#                             inicio = 36, 
+#                             fin = 254)
+# ejemplo4
 
 
 # Aplicar a toda la base --------------------------------------------------
@@ -219,4 +219,66 @@ write_rds(x = indi_gst_social,
           file = "tablas_intermedias/gasto_social_cepal.rds", compress = "gz")
 
 
-  
+
+# SOLO GASTO SOCIAL -------------------------------------------------------
+
+# Elegir solo de Gasto social y las variables de interes
+
+gasto_social <- indi_gst_social %>% 
+  filter(Funciones_gobierno =="Gasto social") %>% 
+  select(Year, Indicador_valor, Pais)
+
+# Aquí se ve que todos tienen "GOBIERNO CENTRAL - "
+# split(x = gasto_social, f = gasto_social$Pais)
+
+
+# Dejar solo los nombres de los paises
+gasto_social <- gasto_social %>% 
+  mutate(Pais = str_remove(string = Pais, 
+                           pattern = "GOBIERNO[:space:]CENTRAL[:space:]\\-[:space:]"),
+         Pais = str_remove(string = Pais, pattern = "\\(.*") %>% 
+           str_trim())
+
+# Cambiar de mayúsculas a tipo oracion
+gasto_social <- gasto_social %>% mutate(Pais = stringr::str_to_title(gasto_social$Pais))
+
+
+# Quitar las tildes y espacios para homologar la base
+gasto_social <- gasto_social %>% 
+  mutate(Pais = case_when(Pais == "Costa Rica"~"Costa_Rica",
+                                                 Pais == "El Salvador"~"Salvador",
+                                                 Pais == "México" ~ "Mexico",
+                                                 Pais == "Panamá" ~ "Panama",
+                                                 Pais == "Perú" ~ "Peru",
+                                                 Pais == "República Dominicana" ~ "Republica_Dominicana",
+                                         TRUE ~ Pais)) %>% 
+  rename(pais = Pais)
+
+# Convertir a número el indicador
+
+gasto_social <- gasto_social %>% mutate(Indicador_valor = as.double(Indicador_valor))
+
+# Verificar los nombres
+table(gasto_social$pais)
+summary(gasto_social)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

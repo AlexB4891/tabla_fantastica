@@ -17,6 +17,7 @@ class(pagina_presidentes)
 tablas_html <- pagina_presidentes %>% 
   html_nodes("table") 
 
+
 # Convertir la tabla de "xml" a un bonito data.frame
 
 tabla_final <- tablas_html[[2]] %>% 
@@ -32,6 +33,7 @@ tabla_final <- tablas_html[[2]] %>%
 
 tabla_final <- tabla_final %>% 
   select(-c(1,2,9))
+
 
  tabla_final_tidy <- tabla_final %>% 
   mutate(
@@ -58,22 +60,7 @@ tabla_final <- tabla_final %>%
  Ecuador <- Ecuador %>%
    filter(year(inicio) >= 1998) 
 
- 
- # 1. Sacar el año de la fecha de inicio
- # 2. Hacer un join con los datos del gasto social
- # 3. Pasar la funcion del grafico 
- # Hay que completar las series de tiempo
- 
- data_year <- tibble(year = 1990:2021) 
- 
- tibble(year = c(2006,2010,2015,2021),
-        valor = rnorm(4)) %>% 
-   right_join(data_year) %>% 
-   arrange(year) %>% 
-   fill(valor,.direction = "down") %>% 
-   ggplot(mapping = aes(x = year,y = valor)) +
-   geom_line()
- # 
+
  
  # Funciones auxiliares que no se usaron
 # class(tabla_final_tidy$edad)
@@ -84,10 +71,12 @@ tabla_final <- tabla_final %>%
 # tabla_final_tidy %>% mutate(tamano = map(periodo_presidencia,length)) %>% count(tamano)
 
 
-# Funcion para sacar tablas de los paises ---------------------------------
-
-# 1. Armar una lista de urls
-# 2. Crear un vector con la posicion de la tabla despues de sacar los nodos
+ 
+ 
+ # Funcion para sacar tablas de los paises ---------------------------------
+ 
+ # 1. Armar una lista de urls
+ # 2. Crear un vector con la posicion de la tabla despues de sacar los nodos
 
 extraer_tabla_presidentes <- function(url, posicion_tabla){
   
@@ -605,6 +594,8 @@ Uruguay <- Uruguay %>% mutate(pais = "Uruguay")
 
 # Base Venezuela ----------------------------------------------------------
 
+# Primera tabla
+
 Venezuela <- bases[[20]]
 
 names(Venezuela)
@@ -618,34 +609,75 @@ Venezuela <-   operacion_fechas(base = Venezuela,
                    variables = c("inicio", "fin"), 
                    formato = "%d %B %Y")
 
+# Segunda tabla
+
 Venezuela1 <- bases[[21]]
 
 Venezuela1 <- Venezuela1 %>% 
   select(c(4, 7,8)) %>% 
   rename(nombre_del_presidente = Presidente, 
          inicio = `Inicio del mandato`, 
-         fin = `Fin del mandato`) 
+         fin = `Fin del mandato`) %>% 
+  mutate(nombre_del_presidente = str_remove(string = nombre_del_presidente, pattern = "\\(.*"))
 
-Venezuela1 <-   operacion_fechas(base = Venezuela1, 
-                                variables = c("inicio", "fin"), 
-                                formato = "%d %B %Y")
+Venezuela1 <- operacion_fechas(base = Venezuela1, 
+                 variables = c("inicio", "fin"), 
+                 formato = "%d %B %Y")
 
-Venezuela %>% inner_join(Venezuela1)
+# Uniendo las bases para dejar una sola
 
-# inner_join(x = Venezuela, y = Venezuela1, by = "nombre_del_presidente inicio")
-# 
-# merge(x = Venezuela, y = Venezuela1, by = "nombre_del_presidente inicio", all = TRUE)
+Venezuela <- rbind(Venezuela, Venezuela1) %>% mutate(pais = "Venezuela")
 
-# Paises ------------------------------------------------------------------
+# Borrando la base que ya no se necesita
+rm(Venezuela1)
 
 
-paises_latinoamerica <- c("Argentina", "Bolivia", "Brasil", 
-                          "Chile", "Colombia", "Costa Rica", 
-                          "Cuba", "Ecuador", "El Salvador",
-                          "Guatemala", "Honduras", "México", 
-                          "Nicaragua", "Panama", "Paraguay", 
-                          "Peru", "Puerto Rico", "Republica Dominicana", 
-                          "Uruguay", "Venezuela", "Venezuela")
+# Uniendo a todos los países ----------------------------------------------
+
+paises_base <- rbind(Argentina, Bolivia, Brasil, 
+      Chile, Colombia, Costa_Rica, 
+      Cuba, Ecuador, Salvador, 
+      Guatemala, Honduras, Mexico, 
+      Nicaragua, Panama, Paraguay, 
+      Peru, Puerto_Rico, Republica_Dominicana,
+      Uruguay, Venezuela)
+
+
+
+
+# UNIR paises con gasto social --------------------------------------------
+
+
+# Crear una nueva columna con el año de inicio y ponerla como character
+paises_base <- paises_base %>% 
+  mutate(Year = year(inicio) %>% as.character())
+
+
+# Unir las dos bases por año y país, ordenar y rellenar (para abajo) con los valores faltantes
+paises_base %>% 
+  right_join(gasto_social, by = c("Year", "pais")) %>% 
+  arrange("Year") %>% 
+  fill(Indicador_valor, .direction = "down") 
+
+
+
+
+## EJEMPLO DE LO QUE SE ESTÁ HACIENDO PREVIAMENTE
+
+## 1. Sacar el año de la fecha de inicio
+# 2. Hacer un join con los datos del gasto social
+# 3. Pasar la funcion del grafico 
+# Hay que completar las series de tiempo
+
+data_year <- tibble(year = 1990:2021) 
+
+tibble(year = c(2006,2010,2015,2021),
+       valor = rnorm(4)) %>% 
+  right_join(data_year) %>% 
+  arrange(year) %>% 
+  fill(valor,.direction = "down") %>% 
+  ggplot(mapping = aes(x = year,y = valor)) +
+  geom_line()
 
 
 
