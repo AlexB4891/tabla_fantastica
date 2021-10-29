@@ -23,7 +23,6 @@ serie_de_tiempo_resaltada <- function(datos,
                                       variables_filtro,
                                       variable_x,
                                       variable_y){
-  
   tabla_mod <- datos %>% 
     dplyr::mutate(
       dplyr::across(

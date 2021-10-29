@@ -428,20 +428,19 @@ Guatemala <- Guatemala %>% mutate(pais = "Guatemala")
 
 # Base Honduras -----------------------------------------------------------
 
-Honduras <- bases[[11]]
+# Honduras <- bases[[11]]
 
-names(Honduras)
+Honduras <- tibble(nombre_del_presidente = c("Carlos Roberto Flores", "Ricardo Maduro", "Manuel Zelaya",
+                                             "Roberto Micheletti", "Porfirio Lobo", "Juan Orlando Hernández"),
+                   inicio = c("27 de enero de 1998", "27 de enero de 2002", "27 de enero de 2006",
+                              "29 de junio de 2009", "27 de enero de 2010", "27 de enero de 2014"),
+                   fin = c("27 de enero de 2002", "27 de enero de 2006", "28 de junio de 2009",
+                           "27 de enero de 2010", "27 de enero de 2014", "27 de enero de 2022"))
 
-Honduras <- Honduras[, c(1,3,4)]
-
-names(Honduras)<- c("nombre_del_presidente", "inicio", "fin")
-
-# operacion_fechas(base = Honduras, 
-#                  variables = c("inicio", "fin"), 
-#                  formato = "%d %B %Y") %>% filter(year(inicio)>=)
-# 
-# Honduras[c(),]
-
+Honduras <- operacion_fechas(base = Honduras, 
+                             variables = c("inicio", "fin"), 
+                             formato = "%d %B %Y")
+Honduras <- Honduras %>% mutate(pais = "Honduras")
 
 # Base México -------------------------------------------------------------
 
@@ -630,6 +629,8 @@ Venezuela1 <- Venezuela1 %>%
 Venezuela1 <-   operacion_fechas(base = Venezuela1, 
                                 variables = c("inicio", "fin"), 
                                 formato = "%d %B %Y")
+
+Venezuela %>% inner_join(Venezuela1)
 
 # inner_join(x = Venezuela, y = Venezuela1, by = "nombre_del_presidente inicio")
 # 
