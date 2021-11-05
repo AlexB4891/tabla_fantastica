@@ -647,18 +647,24 @@ paises_base <- rbind(Argentina, Bolivia, Brasil,
 
 
 
-
-
-
 # Crear una nueva columna con el año de inicio y ponerla como character
 paises_base <- paises_base %>% 
   mutate(Year = year(inicio) %>% as.character())
 
+
 # UNIR paises con gasto social --------------------------------------------
 
+
+# crear la ruta para llamar a las bases de gasto social
+
 archivos_gasto <- list.files(path = "tablas_intermedias",pattern = "indicador_",full.names = T) 
+
+
+#leer las bases y guardar sus ubicaciones en una lista
+
 gasto_social <- archivos_gasto %>% 
   map(read_rds)
+
 
 
 # Unir las dos bases por año y país, ordenar y rellenar (para abajo) con los valores faltantes
@@ -675,6 +681,8 @@ gasto_social_presidente <- gasto_social %>%
     
   })
 
+
+# Guardar las bases
 walk2(.x = archivos_gasto,
      .y = gasto_social_presidente,~{
        
@@ -689,7 +697,7 @@ walk2(.x = archivos_gasto,
 
 ## EJEMPLO DE LO QUE SE ESTÁ HACIENDO PREVIAMENTE
 
-## 1. Sacar el año de la fecha de inicio
+# 1. Sacar el año de la fecha de inicio
 # 2. Hacer un join con los datos del gasto social
 # 3. Pasar la funcion del grafico 
 # Hay que completar las series de tiempo

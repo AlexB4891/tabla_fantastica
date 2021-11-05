@@ -53,6 +53,23 @@ serie_de_tiempo_resaltada <- function(datos,
 }
 
 
+# INTENTO FALLIDO ---------------------------------------------------------
+
+
+Educacion <- gasto_social_presidente[[2]]
+
+serie_de_tiempo_resaltada(datos = Educacion, 
+                          variables_filtro = list(nombre_del_presidente.x = "Fernando de la Rúa"), 
+                          variable_x = "Indicador_valor", 
+                          variable_y = "Year")
+
+# Declarar como serie de tiempo
+Educacion_1 <- ts(Educacion, start = c(1990, 1), frequency = 1)
+plot(Educacion_1)
+
+
+# EJEMPLO PRÁCTICO DE LA FUNCIÓN ------------------------------------------
+
 
 serie_de_tiempo_resaltada(datos = tibble(iris),
                          variables_filtro = list(Species = "virginica"),
@@ -60,16 +77,16 @@ serie_de_tiempo_resaltada(datos = tibble(iris),
                          variable_y = "Sepal.Width")
 
 iris2 <- iris %>% 
-  mutate(ind = sample(c("a","b"),size = nrow(.),replace = T))
+  mutate(ind = sample(c("a","b"), size = nrow(.),replace = T))
 
 iris_limites <- tibble(x = 4:8) %>% 
-  mutate(x_1 = lag(x,n = 1),
+  mutate(x_1 = lag(x, n = 1),
          y = c("a","b","a","b","a"))
 
  
 ggplot() + 
-  geom_point(data = iris,aes(Sepal.Length,Sepal.Width)) + 
+  geom_point(data = iris, aes(Sepal.Length,Sepal.Width)) + 
   geom_rect(data = iris_limites,
-            aes(xmin = x_1,xmax=x,ymin = -Inf,ymax = Inf,fill = y,color = y),
+            aes(xmin = x_1, xmax=x, ymin = -Inf, ymax = Inf, fill = y, color = y),
                            alpha = 0.1)
 
