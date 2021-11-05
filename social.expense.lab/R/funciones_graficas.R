@@ -20,14 +20,16 @@
 #'                           variable_y = "Sepal.Width")
 #'                           
 serie_de_tiempo_resaltada <- function(datos,
-                                      variables_filtro,
+                                      variables_resaltar,
+                                      variable_filtro,
                                       variable_x,
                                       variable_y){
   tabla_mod <- datos %>% 
+    dplyr::filter(dplyr::if_any(.cols = names(variable_filtro), ~.x == unlist(variable_filtro))) %>% 
     dplyr::mutate(
       dplyr::across(
-      .col = names(variables_filtro),
-      .fns = list(indicador = ~ dplyr::if_else(condition = .x == unlist(variables_filtro),
+      .col = names(variables_resaltar),
+      .fns = list(indicador = ~ dplyr::if_else(condition = .x == unlist(variables_resaltar),
                                         true = 1,
                                         false = 0,
                                         missing = 0)),
@@ -59,7 +61,8 @@ serie_de_tiempo_resaltada <- function(datos,
 Educacion <- gasto_social_presidente[[2]]
 
 serie_de_tiempo_resaltada(datos = Educacion, 
-                          variables_filtro = list(nombre_del_presidente.x = "Fernando de la Rúa"), 
+                          variables_resaltar = list(nombre_del_presidente.x = "Fernando de la Rúa"),
+                          variable_filtro = list(pais = "Argentina"), 
                           variable_x = "Indicador_valor", 
                           variable_y = "Year")
 
