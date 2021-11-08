@@ -1,3 +1,13 @@
+
+paleta_colores <- function(numero){
+  
+  paleta <- colorRampPalette(colors = c("#03071e","#9d0208","#f48c06"))
+  
+  paleta_n <- paleta(n = numero)
+  
+  
+  return(paleta_n)
+}
 #' Resalta una porción de la serie de tiempo de acuerdo a una variable de filtro
 #'
 #' @param datos Un objeto de tipo`tibble` al cual se va a filtrar y con el cual se genera la serie de tiempo
@@ -66,12 +76,44 @@ serie_de_tiempo_resaltada <- function(datos,
 
 Educacion <- gasto_social_presidente[[2]]
 
-serie_de_tiempo_resaltada(datos = Educacion, 
+
+Educacion <- Educacion %>% mutate(Year = as.numeric(Year))
+
+
+argentina_ejemplo <- serie_de_tiempo_resaltada(datos = Educacion, 
                           variables_resaltar = list(nombre_del_presidente = "Fernando de la Rúa"),
                           variable_filtro = list(pais = "Argentina"), 
                           variable_x = "Year", 
-                          variable_y = "Indicador_valor") +
-  transition_states()
+                          variable_y = "Indicador_valor") 
+
+
+edu_boli <- Educacion %>% 
+  filter(pais == "Bolivia" )
+
+limites_ideo <- edu_boli %>%
+  mutate(Year = as.numeric(Year)) %>% 
+  fill(ideologia) %>% 
+  arrange(Year) %>% 
+  mutate(indicador_tend = if_else(ideologia != lag(ideologia) | is.na(lag(ideologia)), 1,0)) %>% 
+  filter(indicador_tend == 1,
+         !is.na(ideologia))
+
+
+
+limites_ideo <- limites_ideo %>% 
+  mutate(lag_year = lag(Year))
+
+
+argentina_ejemplo$plot +
+  geom_rect(data = limites_ideo,
+            mapping = aes(xmin = lag_year,
+                          xmax = Year,
+                          group = ideologia,
+                          fill = ideologia,
+                          ymin = -Inf,
+                          ymax = Inf),alpha = 0.4) +
+  scale_fill_manual(values = paleta_colores(4))
+
 
 library(gganimate)
 

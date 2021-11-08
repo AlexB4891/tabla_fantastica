@@ -47,6 +47,7 @@ usethis::use_package( "scales" )
 usethis::use_package( "shinycssloaders" )
 usethis::use_package( "shinyjs" )
 usethis::use_package( "shinydashboard" )
+usethis::use_package( "dichromat" )
 
 # Add the pipe:
 # Añadir la pipe:
