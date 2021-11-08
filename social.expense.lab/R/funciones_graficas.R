@@ -61,14 +61,14 @@ serie_de_tiempo_resaltada <- function(datos,
 Educacion <- gasto_social_presidente[[2]]
 
 serie_de_tiempo_resaltada(datos = Educacion, 
-                          variables_resaltar = list(nombre_del_presidente.x = "Fernando de la Rúa"),
+                          variables_resaltar = list(nombre_del_presidente = "Fernando de la Rúa"),
                           variable_filtro = list(pais = "Argentina"), 
                           variable_x = "Indicador_valor", 
                           variable_y = "Year")
 
 # Declarar como serie de tiempo
-Educacion_1 <- ts(Educacion, start = c(1990, 1), frequency = 1)
-plot(Educacion_1)
+# Educacion_1 <- ts(Educacion, start = c(1990, 1), frequency = 1)
+# plot(Educacion_1)
 
 
 # EJEMPLO PRÁCTICO DE LA FUNCIÓN ------------------------------------------
@@ -76,6 +76,7 @@ plot(Educacion_1)
 
 serie_de_tiempo_resaltada(datos = tibble(iris),
                          variables_filtro = list(Species = "virginica"),
+                         variables_resaltar = list(Species = "virginica"),
                          variable_x = "Sepal.Length",
                          variable_y = "Sepal.Width")
 

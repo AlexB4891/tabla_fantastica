@@ -220,8 +220,9 @@ Argentina <- operacion_fechas(base = Argentina,
 
 Argentina <- Argentina %>% mutate(inicio = `Inicio del mandato`, fin = `Fin del mandato`) %>% 
   select(nombre_del_presidente, inicio, fin) %>%
-  filter(year(inicio) >= 1998) %>% 
-  mutate(pais = "Argentina")
+  filter(year(inicio) >= 1989) %>% 
+  mutate(pais = "Argentina", 
+         ideologia = "Centro Izquierda")
 
 
 # Base Bolivia ------------------------------------------------------------
@@ -254,9 +255,13 @@ Bolivia <- operacion_fechas(base = Bolivia,variables = c("Inicio", "Final"),form
 
 Bolivia <- Bolivia %>% mutate(inicio = Inicio, fin = Final) %>% 
   select(nombre_del_presidente, inicio, fin) %>%
-  filter(year(inicio) >= 1997) 
+  filter(year(inicio) >= 1989) 
 
-Bolivia <- Bolivia %>% mutate(pais = "Bolivia")
+Bolivia <- Bolivia %>% mutate(pais = "Bolivia", 
+                              ideologia = c("Izquierda", "Centro Derecha", "Derecha", 
+                                            "Derecha", "Centro Derecha", "Centro Derecha",
+                                            "Independiente", "Izquierda", "Izquierda", 
+                                            "Izquierda","Centro Derecha", "Izquierda"))
 
 
 
@@ -274,9 +279,13 @@ Brasil <- Brasil %>% mutate(nombre_del_presidente = Presidente,
                             inicio = `Inicio del mandato`, 
                             fin = `Fin del mandato`) %>% 
   select(nombre_del_presidente, inicio, fin) %>%
-  filter(year(inicio) >= 1995) 
+  filter(year(inicio) >= 1990) 
 
-Brasil <- Brasil %>% mutate(pais = "Brasil")
+Brasil <- Brasil %>% mutate(pais = "Brasil",
+                            ideologia = c("Centro Izquierda", "Centro Izquierda", "Centro Derecha",
+                                          "Centro Derecha", "Centro Izquierda", "Centro Izquierda",
+                                          "Centro Izquierda", "Centro Izquierda", "Centro Izquierda",
+                                          "Independiente"))
 
 
 # Base Chile --------------------------------------------------------------
@@ -295,9 +304,12 @@ Chile <- Chile %>% mutate(nombre_del_presidente = Presidente,
                             inicio = `Inicio del mandato`, 
                             fin = `Fin del mandato`) %>% 
   select(nombre_del_presidente, inicio, fin) %>%
-  filter(year(inicio) >= 1994) 
+  filter(year(inicio) >= 1990) 
 
-Chile <- Chile %>% mutate(pais = "Chile")
+Chile <- Chile %>% mutate(pais = "Chile",
+                          ideologia = c("Centro Izquierda", "Centro Izquierda", "Centro Izquierda",
+                                        "Centro Izquierda", "Centro Derecha", "Centro Izquierda",
+                                        "Centro Derecha"))
 
 
 # Base Colombia -----------------------------------------------------------
@@ -320,10 +332,13 @@ Colombia <- Colombia %>% mutate(periodo_presidencia = str_split(string = Períod
        nombre_del_presidente = str_remove(string = Presidente, 
                                           pattern = "\\(.*|[:digit:].*")) %>% 
   select(nombre_del_presidente, inicio, fin) %>%
-  filter(year(inicio) >= 1998) 
+  filter(year(inicio) >= 1986) 
 
-Colombia <- Colombia %>% mutate(pais = "Colombia")
-
+Colombia <- Colombia %>% mutate(pais = "Colombia",
+                                ideologia = c("Centro Izquierda", "Centro Izquierda", "Centro Izquierda",
+                                              "Centro Izquierda", "Centro Izquierda", "Derecha",
+                                              "Derecha", "Centro Derecha", "Centro Derecha"))
+Colombia <- Colombia[-1,]
 
 # Base Costa Rica ---------------------------------------------------------
 
@@ -339,12 +354,15 @@ Costa_Rica <- operacion_fechas(base = Costa_Rica,
                                variables = c("inicio", "fin"), 
                                formato = "%d %B %Y") %>% 
   mutate(nombre_del_presidente = str_remove(string = nombre_del_presidente, 
-                                                         pattern = "\\(.*")) %>% 
+                                                         pattern = "\\(.*"))%>% 
   select(nombre_del_presidente, inicio, fin) 
 
-Costa_Rica <- Costa_Rica[c(96,98,100,102,104, 106),]
+Costa_Rica <- Costa_Rica[c(92, 94,96,98,100,102,104, 106),]
 
-Costa_Rica <- Costa_Rica %>% mutate(pais = "Costa_Rica")
+Costa_Rica <- Costa_Rica %>% mutate(pais = "Costa_Rica",
+                                    ideologia = c("Centro Derecha", "Centro Derecha", "Centro Derecha",
+                                                  "Centro Derecha", "Centro Derecha", "Centro Derecha",
+                                                  "Centro Derecha", "Centro Derecha"))
 
 
 # Base Cuba ---------------------------------------------------------------
@@ -362,7 +380,8 @@ Cuba <- operacion_fechas(base = Cuba, variables = c("inicio", "fin"), formato = 
 Cuba <- Cuba %>%
   select(nombre_del_presidente, inicio, fin) 
 
-Cuba <- Cuba %>% mutate(pais = "Cuba")
+Cuba <- Cuba %>% mutate(pais = "Cuba",
+                        ideologia = "Izquierda")
 
 
 # Base El Salvador --------------------------------------------------------
@@ -387,9 +406,12 @@ Salvador <- Salvador %>% mutate(nombre_del_presidente = Nombre,
                                 #                                    pattern = "\\(.*|[:digit:].*")
                                 ) %>% 
   select(nombre_del_presidente, inicio, fin) %>%
-  filter(year(inicio) >= 1999) 
+  filter(year(inicio) >= 1989) 
 
-Salvador <- Salvador %>% mutate(pais= "El_Salvador")
+Salvador <- Salvador %>% mutate(pais= "El_Salvador",
+                                ideologia = c("Derecha", "Derecha", "Derecha", 
+                                              "Derecha", "Izquierda", "Izquierda",
+                                              "Centro Derecha"))
 
 
 # Guatemala ---------------------------------------------------------------
@@ -409,12 +431,17 @@ Guatemala <- Guatemala %>% rename(nombre_del_presidente = Presidente,
                      fin = `Fin del mandato`) %>% 
   select(nombre_del_presidente, inicio, fin) 
 
-Guatemala <- Guatemala %>% filter(year(inicio) >= 1996)
+Guatemala <- Guatemala %>% filter(year(inicio) >= 1986)
 
 Guatemala <- Guatemala %>% mutate(nombre_del_presidente = str_remove(string = nombre_del_presidente,
                                                         pattern = "\\..*|[:digit:].*"))
 
-Guatemala <- Guatemala %>% mutate(pais = "Guatemala")
+Guatemala <- Guatemala %>% mutate(pais = "Guatemala",
+                                  ideologia = c("Centro Izquierda", "Derecha", "Derecha",
+                                                "Independiente", "Derecha", "Derecha",
+                                                "Centro Derecha", "Centro Izquierda", "Derecha",
+                                                "Derecha", "Independiente", "Derecha",
+                                                "Centro Derecha"))
 
 
 # Base Honduras -----------------------------------------------------------
