@@ -448,17 +448,24 @@ Guatemala <- Guatemala %>% mutate(pais = "Guatemala",
 
 # Honduras <- bases[[11]]
 
-Honduras <- tibble(nombre_del_presidente = c("Carlos Roberto Flores", "Ricardo Maduro", "Manuel Zelaya",
+Honduras <- tibble(nombre_del_presidente = c("Rafael Leonardo Callejas", "Carlos Roberto Reina",
+                                             "Carlos Roberto Flores", "Ricardo Maduro", "Manuel Zelaya",
                                              "Roberto Micheletti", "Porfirio Lobo", "Juan Orlando Hernández"),
-                   inicio = c("27 de enero de 1998", "27 de enero de 2002", "27 de enero de 2006",
+                   inicio = c("27 de enero de 1990", "27 de enero de 1994",
+                              "27 de enero de 1998", "27 de enero de 2002", "27 de enero de 2006",
                               "29 de junio de 2009", "27 de enero de 2010", "27 de enero de 2014"),
-                   fin = c("27 de enero de 2002", "27 de enero de 2006", "28 de junio de 2009",
+                   fin = c("27 de enero de 1994", "27 de enero de 1998",
+                           "27 de enero de 2002", "27 de enero de 2006", "28 de junio de 2009",
                            "27 de enero de 2010", "27 de enero de 2014", "27 de enero de 2022"))
 
 Honduras <- operacion_fechas(base = Honduras, 
                              variables = c("inicio", "fin"), 
                              formato = "%d %B %Y")
-Honduras <- Honduras %>% mutate(pais = "Honduras")
+
+Honduras <- Honduras %>% mutate(pais = "Honduras", 
+                                ideologia = c("Centro Derecha","Centro Derecha", 
+                                              "Centro Derecha", "Derecha", "Centro Izquierda", 
+                                              "", "",""))
 
 # Base México -------------------------------------------------------------
 
@@ -663,20 +670,21 @@ rm(Venezuela1)
 
 # Uniendo a todos los países ----------------------------------------------
 
-paises_base <- rbind(Argentina, Bolivia, Brasil, 
+paises_base <- bind_rows(Argentina, Bolivia, Brasil, 
       Chile, Colombia, Costa_Rica, 
       Cuba, Ecuador, Salvador, 
       Guatemala, Honduras, Mexico, 
       Nicaragua, Panama, Paraguay, 
       Peru, Puerto_Rico, Republica_Dominicana,
-      Uruguay, Venezuela)
+      Uruguay, Venezuela) %>% 
+  rename_with(.cols = c(2,3), .fn = ~str_c(.x, "_fecha"))
 
 
 
 
 # Crear una nueva columna con el año de inicio y ponerla como character
 paises_base <- paises_base %>% 
-  mutate(Year = year(inicio) %>% as.character())
+  mutate(Year = year(inicio_fecha) %>% as.character())
 
 
 # UNIR paises con gasto social --------------------------------------------
@@ -689,14 +697,14 @@ archivos_gasto <- list.files(path = "tablas_intermedias",pattern = "indicador_",
 
 #leer las bases y guardar sus ubicaciones en una lista
 
-gasto_social <- archivos_gasto %>% 
+gasto_social_1 <- archivos_gasto %>% 
   map(read_rds)
 
 
 
 # Unir las dos bases por año y país, ordenar y rellenar (para abajo) con los valores faltantes
 
-gasto_social_presidente <- gasto_social %>% 
+gasto_social_presidente <- gasto_social_1 %>% 
   map(~{
 
     paises_base %>% 

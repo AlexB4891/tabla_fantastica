@@ -25,7 +25,8 @@ serie_de_tiempo_resaltada <- function(datos,
                                       variable_x,
                                       variable_y){
   tabla_mod <- datos %>% 
-    dplyr::filter(dplyr::if_any(.cols = names(variable_filtro), ~.x == unlist(variable_filtro))) %>% 
+    ungroup() %>% 
+    dplyr::filter(dplyr::if_any(.cols = dplyr::any_of(names(variable_filtro)), ~.x == unlist(variable_filtro))) %>% 
     dplyr::mutate(
       dplyr::across(
       .col = names(variables_resaltar),
@@ -39,10 +40,14 @@ serie_de_tiempo_resaltada <- function(datos,
     )
   
   grafico_mod <- ggplot2::ggplot(data = tabla_mod) +
-    ggplot2::geom_point(mapping = ggplot2::aes_string(x = variable_x,
+    ggplot2::geom_line(mapping = ggplot2::aes_string(x = variable_x,
                                                       y = variable_y,
                                                       group = "indicador",
                                                       color = "indicador")) +
+    ggplot2::geom_point(mapping = ggplot2::aes_string(x = variable_x,
+                                                     y = variable_y,
+                                                     group = "indicador",
+                                                     color = "indicador"),size = 3) +
     ggplot2::scale_color_manual(values = c("#FFC300",
                                            "#581845"))
   
@@ -55,6 +60,7 @@ serie_de_tiempo_resaltada <- function(datos,
 }
 
 
+
 # INTENTO FALLIDO ---------------------------------------------------------
 
 
@@ -63,8 +69,17 @@ Educacion <- gasto_social_presidente[[2]]
 serie_de_tiempo_resaltada(datos = Educacion, 
                           variables_resaltar = list(nombre_del_presidente = "Fernando de la Rúa"),
                           variable_filtro = list(pais = "Argentina"), 
-                          variable_x = "Indicador_valor", 
-                          variable_y = "Year")
+                          variable_x = "Year", 
+                          variable_y = "Indicador_valor") +
+  transition_states()
+
+library(gganimate)
+
+ggplot(iris, aes(x = Petal.Width, y = Petal.Length)) + 
+  geom_point(aes(colour = Species)) + 
+  transition_states(Species,
+                    transition_length = 2,
+                    state_length = 1)
 
 # Declarar como serie de tiempo
 # Educacion_1 <- ts(Educacion, start = c(1990, 1), frequency = 1)
