@@ -1,116 +1,39 @@
+
+# -------------------------------------------------------------------------#
+# ---------------LIMPIEZA DE DATOS DE PAISES -----------------------------
+# -------------------------------------------------------------------------#
+
+
+
+# Librerias ---------------------------------------------------------------
+
 library(tidyverse)
 library(rvest)
 library(lubridate)
 
 
-# Limpiar base para Ecuador -----------------------------------------------
-
-# Lectura de la página web:
-
-pagina_presidentes <- read_html("https://es.wikipedia.org/wiki/Anexo:Presidentes_del_Ecuador")
-
-class(pagina_presidentes)
-
-
-# Extraer todos los elementos de una página web que están dentro de la tag "table"
-
-tablas_html <- pagina_presidentes %>% 
-  html_nodes("table") 
-
-
-# Convertir la tabla de "xml" a un bonito data.frame
-
-tabla_final <- tablas_html[[2]] %>% 
-  html_table()
-
-
-# Si tuviera más tablas:
-#
-# map(.x = tablas_html,.f = html_table)
-
-
-# Eliminar los nombres repetidos
-
-tabla_final <- tabla_final %>% 
-  select(-c(1,2,9))
-
-
- tabla_final_tidy <- tabla_final %>% 
-  mutate(
-    temporal_1 = str_extract(string = Presidencia,pattern = "\\(.*|[:digit:].*"),
-    nombre_del_presidente = str_remove(string = Presidencia,pattern = "\\(.*|[:digit:].*"),
-    edad = str_extract(string = temporal_1,pattern = "[:digit:]{2}[:space:]a.os"),
-    periodo_presidencia = str_split(string = Período,pattern = "-"),
-    inicio = map(.x = periodo_presidencia,~.x[1]),
-    fin = map(.x = periodo_presidencia,~.x[2]),
-    across(.cols = c(inicio,fin),
-           .fns = ~ str_remove(string = .x,pattern = "\\[.\\]")),
-    across(.cols = c(inicio,fin),
-           .fns = ~ str_remove_all(string = .x,pattern = "de[:space:]")),
-    across(.cols = c(inicio,fin),
-           .fns = ~ parse_date(.x,"%d %B %Y",locale=locale("es")))
-  )
  
-
-# Base Ecuador ------------------------------------------------------------
- 
- Ecuador <- tabla_final_tidy %>%
-    select(nombre_del_presidente, inicio, fin)
- 
- Ecuador <- Ecuador %>%
-   filter(year(inicio) >= 1988) 
-
- Ecuador <- Ecuador %>% 
-   mutate(pais = "Ecuador",
-          ideologia = c("Izquierda", "Centro Derecha", "Centro Derecha",
-                        "Centro Izquierda", "Centro Derecha", "Centro Derecha",
-                        "Centro Derecha", "Centro Derecha", "Centro Izquierda",
-                        "Independiente", "Izquierda", "Izquierda",
-                        "Izquierda", "Izquierda","Izquierda",
-                        "Izquierda", "Izquierda", "Izquierda",
-                        "Derecha"))
-
- Ecuador <- Ecuador[-c(3,5,12,13,15,16,17,18),]
- 
- # Funciones auxiliares que no se usaron
-# class(tabla_final_tidy$edad)
-# class(tabla_final_tidy$periodo_presidencia)
-# 
-# tabla_final_tidy %>% 
-#   unnest(cols = periodo_presidencia) %>% View
-# tabla_final_tidy %>% mutate(tamano = map(periodo_presidencia,length)) %>% count(tamano)
-
-
- 
- 
- # Funcion para sacar tablas de los paises ---------------------------------
+ # ------------------FUNCIÓN para sacar tablas de los paises ---------------
  
  # 1. Armar una lista de urls
  # 2. Crear un vector con la posicion de la tabla despues de sacar los nodos
 
 extraer_tabla_presidentes <- function(url, posicion_tabla){
   
-  # Leer la pagina web y usar sus elementos
+# Leer la pagina web y usar sus elementos
   pagina_presidentes <- read_html(url)
   
-  
-  
 # Extraer todos los elementos de una página web que están dentro de la tag "table"
-
   tablas_html <- pagina_presidentes %>% html_nodes("table") 
   
-  
-  
-  
 # Convertir la tabla de "xml" a un bonito data.frame
-  
   tabla_final <- tablas_html[[posicion_tabla]] %>% html_table()
     
   return(tabla_final)
 }
 
 
-# Obteniendo la base bruta de cada país -----------------------------------
+# ------------Obteniendo la base bruta de cada país -----------------------
 
 paises_latinoamerica <- c("Argentina", "Bolivia", "Brasil", 
                           "Chile", "Colombia", "Costa Rica", 
@@ -213,7 +136,73 @@ completar_meses <- function(variable){
 }
 
 
+# -------------------------------------------------------------------------#
+# -----------------------------------PAISES -------------------------------#
+# -------------------------------------------------------------------------#
 
+# Limpiar base para Ecuador -----------------------------------------------
+
+# Lectura de la página web:
+
+pagina_presidentes <- read_html("https://es.wikipedia.org/wiki/Anexo:Presidentes_del_Ecuador")
+
+class(pagina_presidentes)
+
+
+# Extraer todos los elementos de una página web que están dentro de la tag "table"
+tablas_html <- pagina_presidentes %>% 
+  html_nodes("table") 
+
+# Convertir la tabla de "xml" a un bonito data.frame
+tabla_final <- tablas_html[[2]] %>% 
+  html_table()
+
+# Si tuviera más tablas:
+# map(.x = tablas_html,.f = html_table)
+
+# Eliminar los nombres repetidos
+tabla_final <- tabla_final %>% 
+  select(-c(1,2,9))
+
+
+ tabla_final_tidy <- tabla_final %>% 
+  mutate(
+    temporal_1 = str_extract(string = Presidencia,pattern = "\\(.*|[:digit:].*"),
+    nombre_del_presidente = str_remove(string = Presidencia,pattern = "\\(.*|[:digit:].*"),
+    edad = str_extract(string = temporal_1,pattern = "[:digit:]{2}[:space:]a.os"),
+    periodo_presidencia = str_split(string = Período,pattern = "-"),
+    inicio = map(.x = periodo_presidencia,~.x[1]),
+    fin = map(.x = periodo_presidencia,~.x[2]),
+    across(.cols = c(inicio,fin),
+           .fns = ~ str_remove(string = .x,pattern = "\\[.\\]")),
+    across(.cols = c(inicio,fin),
+           .fns = ~ str_remove_all(string = .x,pattern = "de[:space:]")),
+    across(.cols = c(inicio,fin),
+           .fns = ~ parse_date(.x,"%d %B %Y",locale=locale("es")))
+  )
+ 
+
+# Base Ecuador ------------------------------------------------------------
+ 
+ Ecuador <- tabla_final_tidy %>%
+    select(nombre_del_presidente, inicio, fin)
+ 
+ Ecuador <- Ecuador %>%
+   filter(year(inicio) >= 1988) 
+
+ Ecuador <- Ecuador %>% 
+   mutate(pais = "Ecuador",
+          ideologia = c("Izquierda", "Centro Derecha", "Centro Derecha",
+                        "Centro Izquierda", "Centro Derecha", "Centro Derecha",
+                        "Centro Derecha", "Centro Derecha", "Centro Izquierda",
+                        "Independiente", "Izquierda", "Izquierda",
+                        "Izquierda", "Izquierda","Izquierda",
+                        "Izquierda", "Izquierda", "Izquierda",
+                        "Derecha"))
+
+ Ecuador <- Ecuador[-c(3,5,12,13,15,16,17,18),]
+
+ 
 # Base Argentina ----------------------------------------------------------
 
 Argentina <- bases[[1]]
@@ -232,6 +221,15 @@ Argentina <- Argentina %>% mutate(inicio = `Inicio del mandato`, fin = `Fin del 
   filter(year(inicio) >= 1989) %>% 
   mutate(pais = "Argentina", 
          ideologia = "Centro Izquierda")
+
+# pagina <- read_html("https://es.wikipedia.org/wiki/Anexo:Presidentes_del_Ecuador")
+# 
+# # Extraer todos los elementos de una página web que están dentro de la tag "table"
+# imagenes <-
+#   pagina %>% 
+#   html_nodes("table") %>%
+#   .[2] 
+
 
 
 # Base Bolivia ------------------------------------------------------------
