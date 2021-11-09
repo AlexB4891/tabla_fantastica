@@ -34,8 +34,9 @@ img <- imagenes %>%
 
 tabla <- tabla[[1]][c(-1,-2,-9)] %>% 
   mutate(img = img,
-         nombre_del_presidente = str_remove(string = Presidencia,pattern = "\\(.*|[:digit:].*"))  %>% 
-    select(img,nombre_del_presidente)
+         nombre_del_presidente = str_remove(string = Presidencia,pattern = "\\(.*|[:digit:].*"))  
+# %>% 
+#     select(img,nombre_del_presidente)
 
 
 imagenes_ecuador <- tabla %>% 
