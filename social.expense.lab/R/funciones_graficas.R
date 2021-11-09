@@ -49,6 +49,20 @@ serie_de_tiempo_resaltada <- function(datos,
     indicador = factor(indicador)
     )
   
+  
+  limites_ideo <- tabla_mod %>%
+    mutate(Year = as.numeric(Year)) %>% 
+    fill(ideologia) %>% 
+    arrange(Year) %>% 
+    mutate(indicador_tend = if_else(ideologia != lag(ideologia) | is.na(lag(ideologia)), 1,0)) %>% 
+    filter(indicador_tend == 1,
+           !is.na(ideologia))
+  
+  limites_ideo <- limites_ideo %>% 
+    mutate(lag_year = lag(Year))
+  
+  conteo_ideo <- limites_ideo %>% ungroup() %>% summarise(np = n_distinct(ideologia))
+  
   grafico_mod <- ggplot2::ggplot(data = tabla_mod) +
     ggplot2::geom_line(mapping = ggplot2::aes_string(x = variable_x,
                                                       y = variable_y,
@@ -59,7 +73,15 @@ serie_de_tiempo_resaltada <- function(datos,
                                                      group = "indicador",
                                                      color = "indicador"),size = 3) +
     ggplot2::scale_color_manual(values = c("#FFC300",
-                                           "#581845"))
+                                           "#581845")) +
+    geom_rect(data = limites_ideo,
+              mapping = aes(xmin = lag_year,
+                            xmax = Year,
+                            group = ideologia,
+                            fill = ideologia,
+                            ymin = -Inf,
+                            ymax = Inf),alpha = 0.4) +
+    scale_fill_manual(values = paleta_colores(conteo_ideo$np)
   
   resultado <- list(
     tabla = tabla_mod,
@@ -80,11 +102,18 @@ Educacion <- gasto_social_presidente[[2]]
 Educacion <- Educacion %>% mutate(Year = as.numeric(Year))
 
 
-argentina_ejemplo <- serie_de_tiempo_resaltada(datos = Educacion, 
+# argentina_ejemplo <- 
+  serie_de_tiempo_resaltada(datos = Educacion, 
                           variables_resaltar = list(nombre_del_presidente = "Fernando de la Rúa"),
                           variable_filtro = list(pais = "Argentina"), 
                           variable_x = "Year", 
                           variable_y = "Indicador_valor") 
+  
+  serie_de_tiempo_resaltada(datos = Educacion, 
+                            variables_resaltar = list(nombre_del_presidente = "Fernando de la Rúa"),
+                            variable_filtro = list(pais = "Bolivia"), 
+                            variable_x = "Year", 
+                            variable_y = "Indicador_valor") 
 
 
 edu_boli <- Educacion %>% 
