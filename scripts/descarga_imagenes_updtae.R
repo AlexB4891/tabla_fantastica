@@ -26,6 +26,7 @@ tabla <- imagenes %>%
 img <- imagenes %>% 
   html_nodes("tr")  %>% 
   map(~.x %>% html_node("img")) %>%
+  #Scrape the website for the url
   map(~.x %>% html_attr("src")) %>% 
   unlist() %>% 
   .[2:121]
