@@ -1,0 +1,146 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(plotly)
+library(tidyverse)
+library(gt)
+library(htmltools)
+
+
+# Esto es para cada una de las categorias:
+
+iris %>% 
+  filter(Species == "setosa") %>% 
+  ggplot() +
+  geom_point(aes(x = Sepal.Width,y=Sepal.Length))
+
+iris %>% 
+  filter(Species == "virginica") %>% 
+  ggplot() +
+  geom_point(aes(x = Sepal.Width,y=Sepal.Length))
+
+iris %>% 
+  filter(Species == "versicolor") %>% 
+  ggplot() +
+  geom_point(aes(x = Sepal.Width,y=Sepal.Length))
+
+# En su lugar podemos un split y utilizando un map:
+
+
+iris_plot_lista <- iris %>% 
+  split(.$Species) %>% 
+  map(~.x %>% 
+        ggplot() +
+        geom_point(aes(x = Sepal.Width,y=Sepal.Length)))
+
+names(iris_plot_lista)
+
+iris_plot_lista[[1]]
+iris_plot_lista[[2]]
+iris_plot_lista[[3]]
+
+# Anidar la información en una columna y siempre trabajar dentro de un data.frame:
+
+nest_iris <- iris %>% 
+  group_by(Species) %>% 
+  nest_by()
+
+
+nest_iris_2 <- nest_iris %>% 
+  mutate(plot_point = list(ggplot(data ) +
+                             geom_point(aes(x = Sepal.Width,y=Sepal.Length)))
+  )
+
+
+plotly::ggplotly(iris_plot_lista[[1]])
+
+nest_iris_2 <- nest_iris_2 %>% 
+  mutate(plotly_list = list(plotly::ggplotly(plot_point)))
+
+nest_iris_2 <- nest_iris_2 %>% 
+  mutate(plotly_list = list(plotly_list %>%
+           as.tags() %>%
+           as.character() %>%
+           htmltools::HTML()))
+
+
+nest_iris_3 <- nest_iris_2 %>% 
+  select(-data,-plot_point) 
+
+  
+  DT::datatable(nest_iris_3, escape = FALSE,options = list(
+  fnDrawCallback = htmlwidgets::JS(
+    '
+function(){
+  HTMLWidgets.staticRender();
+}
+'
+  )))
+
+```
+
+
+Termometro de la tendencia politica:
+
+ <br>
+                       <span style="background-color: #A50026; opacity: 0.5;"> &emsp;&emsp;&nbsp;</span>
+                       <span style="background-color: #D73027; opacity: 0.5;"> &emsp;&emsp;</span>
+                       <span style="background-color: #F46D43; opacity: 0.5;"> &emsp;&emsp;</span>
+                       <span style="background-color: #FDAE61; opacity: 0.5;"> &emsp;&emsp;</span>
+                       <span style="background-color: #FEE090; opacity: 0.5;"> &emsp;&emsp;</span>
+                       <span style="background-color: #FFFFBF; opacity: 0.5;"> &emsp;&emsp;</span>
+                       <span style="background-color: #E0F3F8; opacity: 0.5;"> &emsp;&emsp;</span>
+                       <span style="background-color: #ABD9E9; opacity: 0.5;"> &emsp;&emsp;</span>
+                       <span style="background-color: #74ADD1; opacity: 0.5;"> &emsp;&emsp;</span>
+                       <span style="background-color: #4575B4; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <br>
+                       <span style="color: black;">      $0-1&nbsp;</span>
+                       <span style="color: black;"> &nbsp;1-2&nbsp;</span>
+                       <span style="color: black;"> &nbsp;2-3&nbsp;</span>
+                       <span style="color: black;"> &nbsp;3-4&nbsp;</span>
+                       <span style="color: black;"> &nbsp;4-5&nbsp;</span>
+                       <span style="color: black;"> &nbsp;5-6&nbsp;</span>
+                       <span style="color: black;"> &nbsp;6-7&nbsp;</span>
+                       <span style="color: black;"> &nbsp;7-8&nbsp;</span>
+                       <span style="color: black;"> &nbsp;8-9&nbsp;</span>
+                       <span style="color: black;"> &nbsp;9-10&nbsp;</span>
+                         
+                         
+                         
+```{r}
+
+enlaces <- c(
+"https://thumbs.dreamstime.com/z/flor-del-iris-setosa-del-iris-67468042.jpg",
+
+"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Iris_virginica.jpg/250px-Iris_virginica.jpg",
+
+"https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.consejosparamihuerto.com%2Ffamilias%2Firis-versicolore%2F&psig=AOvVaw0k6NQUBUn92QtLkqLrRd27&ust=1636636896960000&source=images&cd=vfe&ved=0CAsQjRxqFwoTCLjx1NfxjfQCFQAAAAAdAAAAABAD")
+
+
+nest_iris_4 <- nest_iris_3 %>% 
+  mutate(
+    src = list(enlaces),
+    Species = list(str_c('<div><b>',Species,'</b><br><img src="',src,'">',
+                         "</div>"))) %>% 
+  select(-src)
+
+
+  DT::datatable(nest_iris_4, escape = FALSE,options = list(
+  fnDrawCallback = htmlwidgets::JS(
+    '
+function(){
+  HTMLWidgets.staticRender();
+}
+'
+  )))
+
+```
+
+
