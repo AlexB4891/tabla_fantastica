@@ -1,0 +1,67 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(plotly)
+library(tidyverse)
+library(gt)
+library(htmltools)
+
+tabla <- tibble(pais= c("Ecuador"),
+                Presidente = c("Rafael Correa"),
+                serie_de_tiempo = c(1),
+                variacion = c("aumentó")) 
+
+img_pais <- c("https://a.espncdn.com/combiner/i?img=%2Fi%2Fteamlogos%2Fsoccer%2F500%2F209.png")
+img_pres <- c("https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Presidente_Rafael_Correa.jpg/200px-Presidente_Rafael_Correa.jpg")
+img_serie <-c("../imagenes/Ecuador.png") 
+
+
+tabla <- tabla %>% mutate(pais = str_c('<div>
+                                       <b>',pais,'</b>
+                                       <br>
+                                       <img src="',img_pais,'" height="150" >',
+                                       "</div>"),
+                         Presidente = str_c('<div>
+                                            <b>',Presidente,
+                                            '</b><br>
+                                            <img src="',img_pres,'" height="150" >',
+                                            "</div>"),
+                         serie_de_tiempo = print(img_serie))
+
+  DT::datatable(tabla, escape = FALSE,options = list(
+  fnDrawCallback = htmlwidgets::JS(
+    '
+function(){
+  HTMLWidgets.staticRender();
+}
+'
+  )))
+
+```
+
+
+Termometro de la tendencia politica:
+
+ <br>
+                       <span style="background-color: #03071E; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #400515; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #7E030C; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #AE1D07; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #D15406; opacity: 0.5;"> &emsp;&emsp;&nbsp;</span>
+                       <span style="background-color: #F48C06; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <br>
+                       <span style="color: black;">      $0-1&nbsp;</span>
+                       <span style="color: black;"> &nbsp;1-2&nbsp;</span>
+                       <span style="color: black;"> &nbsp;2-3&nbsp;</span>
+                       <span style="color: black;"> &nbsp;3-4&nbsp;</span>
+                       <span style="color: black;"> &nbsp;4-5&nbsp;</span>
+                       <span style="color: black;"> &nbsp;5-6&nbsp;</span>
+                         
+ 

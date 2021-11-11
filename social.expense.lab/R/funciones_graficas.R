@@ -8,6 +8,7 @@ paleta_colores <- function(numero){
   
   return(paleta_n)
 }
+
 #' Resalta una porción de la serie de tiempo de acuerdo a una variable de filtro
 #'
 #' @param datos Un objeto de tipo`tibble` al cual se va a filtrar y con el cual se genera la serie de tiempo
@@ -87,7 +88,7 @@ serie_de_tiempo_resaltada <- function(datos,
     tabla = tabla_mod,
     plot = grafico_mod
   )
-  
+
   return(resultado)
 }
 
@@ -109,13 +110,21 @@ Educacion <- Educacion %>% mutate(Year = as.numeric(Year))
                           variable_x = "Year", 
                           variable_y = "Indicador_valor") 
   
-  serie_de_tiempo_resaltada(datos = Educacion, 
+ serie_de_tiempo_resaltada(datos = Educacion, 
                             variables_resaltar = list(nombre_del_presidente = "Fernando de la Rúa"),
-                            variable_filtro = list(pais = "Bolivia"), 
+                            variable_filtro = list(pais = "Ecuador"), 
                             variable_x = "Year", 
                             variable_y = "Indicador_valor") 
 
+png("imagenes/Ecuador.png",
+    width = 6,
+    height = 4,
+    units = "in",res = 72)
+print(ej$plot)
+dev.off()
 
+
+  
 edu_boli <- Educacion %>% 
   filter(pais == "Bolivia" )
 
