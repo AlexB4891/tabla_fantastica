@@ -82,8 +82,9 @@ serie_de_tiempo_resaltada <- function(datos,
                             fill = ideologia,
                             ymin = -Inf,
                             ymax = Inf),alpha = 0.4) +
-    scale_fill_manual(values = paleta_colores(conteo_ideo$np)
-  
+    scale_fill_manual(values = paleta_colores(conteo_ideo$np))
+                      
+                      
   resultado <- list(
     tabla = tabla_mod,
     plot = grafico_mod
