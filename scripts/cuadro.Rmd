@@ -50,18 +50,18 @@ function(){
 Termometro de la tendencia politica:
 
  <br>
-                       <span style="background-color: #03071E; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
-                       <span style="background-color: #400515; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
-                       <span style="background-color: #7E030C; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
-                       <span style="background-color: #AE1D07; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
-                       <span style="background-color: #D15406; opacity: 0.5;"> &emsp;&emsp;&nbsp;</span>
-                       <span style="background-color: #F48C06; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #BBB3B3; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #E32219; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #F37B7B; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #F5EE0A; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
+                       <span style="background-color: #6FA2E0; opacity: 0.5;"> &emsp;&emsp;&nbsp;</span>
+                       <span style="background-color: #0471F5; opacity: 0.5;"> &emsp;&emsp;&nbsp;&nbsp;</span>
                        <br>
-                       <span style="color: black;">      $0-1&nbsp;</span>
-                       <span style="color: black;"> &nbsp;1-2&nbsp;</span>
-                       <span style="color: black;"> &nbsp;2-3&nbsp;</span>
-                       <span style="color: black;"> &nbsp;3-4&nbsp;</span>
-                       <span style="color: black;"> &nbsp;4-5&nbsp;</span>
-                       <span style="color: black;"> &nbsp;5-6&nbsp;</span>
+                       <span style="color: black;">      $ind&nbsp;</span>
+                       <span style="color: black;"> &nbsp;Izq&nbsp;</span>
+                       <span style="color: black;"> &nbsp;C-I&nbsp;</span>
+                       <span style="color: black;"> &nbsp;Cent&nbsp;</span>
+                       <span style="color: black;"> &nbsp;C-D&nbsp;</span>
+                       <span style="color: black;"> &nbsp;Der&nbsp;</span>
                          
  
