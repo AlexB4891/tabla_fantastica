@@ -33,8 +33,8 @@ server <- function(input, output) {
     
   })
   
-  output$serie_de_tiempo <- renderPlotly({
-    ggplotly(grafico_serie()$plot)
+  output$serie_de_tiempo <- renderPlot({
+    grafico_serie()$plot
   })
   
   output[["imgName"]] <- renderText({

@@ -16,9 +16,9 @@ ui <- fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(width = 3,
-          textOutput("imgName"),
-          DTOutput("tabla_filtrada"),
-          plotlyOutput("serie_de_tiempo")
+          fluidRow(textOutput("imgName"),
+                   DTOutput("tabla_filtrada")),
+          fluidRow(plotOutput("serie_de_tiempo", width='100%'))
     )
   )
 )
