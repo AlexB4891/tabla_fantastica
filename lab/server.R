@@ -31,21 +31,24 @@ server <- function(input, output) {
   
   output$tabla_filtrada <- renderDT({
     
-    browser()
+   # browser()
     
     tibble(
       País = "Ecuador",
-      Presidentes = list(slickR(imgs)),
-      `Serie de tiempo` = list(ggplotly(grafico_serie()$plot))
+      Presidentes = list(slickROutput("slick_output"))
+      # ,
+      # `Serie de tiempo` = list(ggplotly(grafico_serie()$plot))
     ) %>% 
       mutate(Presidentes = list(Presidentes %>%
                                   as.tags() %>%
                                   as.character() %>%
-                                  htmltools::HTML()),
-             `Serie de tiempo` =  list(`Serie de tiempo` %>%
-                                         as.tags() %>%
-                                         as.character() %>%
-                                         htmltools::HTML()))
+                                  htmltools::HTML())
+             # ,
+             # `Serie de tiempo` =  list(`Serie de tiempo` %>%
+             #                             as.tags() %>%
+             #                             as.character() %>%
+             #                             htmltools::HTML())
+             )
   }, escape = FALSE,options = list(
     fnDrawCallback = htmlwidgets::JS(
       '
