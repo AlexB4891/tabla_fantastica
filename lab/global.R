@@ -18,6 +18,7 @@ require(slickR)
 # Manejo de datos:
 require(tidyverse)
 require(lubridate)
+require(plotly)
 
 # Formatos:
 require(scales)
