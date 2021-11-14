@@ -33,7 +33,8 @@ iris %>%
 
 # En su lugar podemos un split y utilizando un map:
 
-
+# Split separa un dataframe en las categorías que tiene la vairable seleccionada
+# base %>% split(.$variable)
 iris_plot_lista <- iris %>% 
   split(.$Species) %>% 
   map(~.x %>% 
@@ -42,9 +43,12 @@ iris_plot_lista <- iris %>%
 
 names(iris_plot_lista)
 
+# Imprimir cada elemento de la lista, se imprime un gráfico
+
 iris_plot_lista[[1]]
 iris_plot_lista[[2]]
 iris_plot_lista[[3]]
+
 
 # Anidar la información en una columna y siempre trabajar dentro de un data.frame:
 
@@ -52,17 +56,23 @@ nest_iris <- iris %>%
   group_by(Species) %>% 
   nest_by()
 
+# Añadió al anterior dataframe anidado una columna con las imágenes creadas
 
 nest_iris_2 <- nest_iris %>% 
   mutate(plot_point = list(ggplot(data ) +
                              geom_point(aes(x = Sepal.Width,y=Sepal.Length)))
   )
 
+# ploty::ggplotly (grafico creado previamente)
+# Hace que aparezce la imagen con opciones de edición
 
 plotly::ggplotly(iris_plot_lista[[1]])
 
 nest_iris_2 <- nest_iris_2 %>% 
   mutate(plotly_list = list(plotly::ggplotly(plot_point)))
+
+
+# Transforma la columna ploty_list de elemento plotly a elemento html
 
 nest_iris_2 <- nest_iris_2 %>% 
   mutate(plotly_list = list(plotly_list %>%
@@ -70,10 +80,14 @@ nest_iris_2 <- nest_iris_2 %>%
            as.character() %>%
            htmltools::HTML()))
 
+# Como ya se usaron los elementos de la tabla anidada, en este se deja solo lo que interesa
+# las categorías y su respectiva imagen en html
 
 nest_iris_3 <- nest_iris_2 %>% 
   select(-data,-plot_point) 
 
+
+# Se imprime como si fuese una página web, sólo los elementos que quedaron
   
   DT::datatable(nest_iris_3, escape = FALSE,options = list(
   fnDrawCallback = htmlwidgets::JS(
