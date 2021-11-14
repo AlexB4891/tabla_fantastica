@@ -14,6 +14,7 @@ require(shinycssloaders)
 require(shinyjs)
 require(shinydashboard)
 require(slickR)
+require(htmltools)
 
 # Manejo de datos:
 require(tidyverse)
@@ -134,17 +135,7 @@ serie_de_tiempo_resaltada <- function(datos,
   
   conteo_ideo <- limites_ideo %>% ungroup() %>% summarise(np = n_distinct(ideologia))
   
-  grafico_mod <- ggplot2::ggplot(data = tabla_mod) +
-    ggplot2::geom_line(mapping = ggplot2::aes_string(x = variable_x,
-                                                     y = variable_y,
-                                                     group = "indicador",
-                                                     color = "indicador")) +
-    ggplot2::geom_point(mapping = ggplot2::aes_string(x = variable_x,
-                                                      y = variable_y,
-                                                      group = "indicador",
-                                                      color = "indicador"),size = 3) +
-    ggplot2::scale_color_manual(values = c("#FFC300",
-                                           "#581845")) +
+  grafico_mod <- ggplot2::ggplot() +
     geom_rect(data = limites_ideo,
               mapping = aes(xmin = lag_year,
                             xmax = Year,
@@ -152,6 +143,16 @@ serie_de_tiempo_resaltada <- function(datos,
                             fill = ideologia,
                             ymin = -Inf,
                             ymax = Inf),alpha = 0.4) +
+    ggplot2::geom_line(data = tabla_mod,mapping = ggplot2::aes_string(x = variable_x,
+                                                     y = variable_y,
+                                                     group = "indicador",
+                                                     color = "indicador")) +
+    ggplot2::geom_point(data = tabla_mod,mapping = ggplot2::aes_string(x = variable_x,
+                                                      y = variable_y,
+                                                      group = "indicador",
+                                                      color = "indicador"),size = 3) +
+    ggplot2::scale_color_manual(values = c("#FFC300",
+                                           "#581845")) +
     scale_fill_manual(values = paleta_colores(conteo_ideo$np))
   
   resultado <- list(

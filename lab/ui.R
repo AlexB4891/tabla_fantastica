@@ -18,7 +18,7 @@ ui <- fluidPage(
     mainPanel(width = 3,
           fluidRow(textOutput("imgName"),
                    DTOutput("tabla_filtrada")),
-          fluidRow(plotOutput("serie_de_tiempo", width='100%'))
+          fluidRow(plotlyOutput("serie_de_tiempo", width='100%'))
     )
   )
 )

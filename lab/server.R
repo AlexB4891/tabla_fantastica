@@ -16,12 +16,8 @@ server <- function(input, output) {
       str_extract("(?<=\\/\\/).*$")
   })
   
-  tabla_seria <- reactive({
+  tabla_serie <- reactive({
     Ecuador %>% filter(nombre_del_presidente == presidente())
-  })
-  
-  output$tabla_filtrada <- renderDT({
-    tabla_seria()
   })
   
   grafico_serie <- reactive({
@@ -33,8 +29,35 @@ server <- function(input, output) {
     
   })
   
-  output$serie_de_tiempo <- renderPlot({
-    grafico_serie()$plot
+  output$tabla_filtrada <- renderDT({
+    
+    browser()
+    
+    tibble(
+      País = "Ecuador",
+      Presidentes = list(slickR(imgs)),
+      `Serie de tiempo` = list(ggplotly(grafico_serie()$plot))
+    ) %>% 
+      mutate(Presidentes = list(Presidentes %>%
+                                  as.tags() %>%
+                                  as.character() %>%
+                                  htmltools::HTML()),
+             `Serie de tiempo` =  list(`Serie de tiempo` %>%
+                                         as.tags() %>%
+                                         as.character() %>%
+                                         htmltools::HTML()))
+  }, escape = FALSE,options = list(
+    fnDrawCallback = htmlwidgets::JS(
+      '
+function(){
+  HTMLWidgets.staticRender();
+}
+'
+    )))
+  
+  
+  output$serie_de_tiempo <- renderPlotly({
+    
   })
   
   output[["imgName"]] <- renderText({
