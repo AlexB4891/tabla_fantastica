@@ -12,7 +12,7 @@ server <- function(input, output) {
   
   presidente <- reactive({
   # browser()
-    str_remove(imgs[input$imageIndex],"\\..{3,4}")
+    str_remove(imgs[input$imageIndex],"\\..{3,4}$")
   })
   
   output[["imgName"]] <- renderText({
