@@ -18,6 +18,7 @@ require(slickR)
 # Manejo de datos:
 require(tidyverse)
 require(lubridate)
+require(plotly)
 
 # Formatos:
 require(scales)
@@ -59,7 +60,9 @@ $(document).ready(function(){
 # Lectura de los datos ----------------------------------------------------
 
 
-indicador_gasto_social <- read_rds("../tablas_intermedias/indicador_gasto_social.rds")
+indicador_gasto_social <- read_rds("../tablas_intermedias/indicador_gasto_social.rds")  %>% 
+  mutate(Year = as.numeric(Year)) %>% 
+  ungroup()
 
 Ecuador <- indicador_gasto_social %>% filter(pais == "Ecuador")
 
