@@ -43,13 +43,13 @@ paises <- c("Argentina", "Bolivia", "Brasil",
 
 # Otras fuentes: ----------------------------------------------------------
 
-js <- "
+js_ecu <- "
 $(document).ready(function(){
-  var ss = document.getElementById('slick_output');
+  var ss = document.getElementById('slickEcuador');
   // create an observer instance
   var observer = new MutationObserver(function(mutations) {
     var index = $(ss).find('.slick-current').data('slick-index');
-    Shiny.setInputValue('imageIndex', parseInt(index)+1);
+    Shiny.setInputValue('indiceEcuador', parseInt(index)+1);
   });
   // configuration of the observer
   var config = {subtree: true, attributes: true};

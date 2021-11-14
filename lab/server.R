@@ -5,14 +5,14 @@ server <- function(input, output) {
   
   # browser()
   
-  output$slick_output <- renderSlickR({
+  output$slickEcuador <- renderSlickR({
     slickR(imgs)
   })
   
   
   presidente <- reactive({
-  browser()
-    str_remove(imgs[input$imageIndex],"\\..{3,4}$") %>% 
+  # browser()
+    str_remove(imgs[input$indiceEcuador],"\\..{3,4}$") %>% 
       str_extract("(?<=\\/\\/).*$")
   })
   
@@ -29,39 +29,39 @@ server <- function(input, output) {
     
   })
   
-  output$tabla_filtrada <- renderDT({
-    
-   # browser()
-    
-    tibble(
-      País = "Ecuador",
-      # Presidentes = list(slickR(imgs))
-      # ,
-      # `Serie de tiempo` = list(ggplotly(grafico_serie()$plot))
-    ) 
-    # %>% 
-    #   mutate(Presidentes = list(Presidentes %>%
-    #                               as.tags() %>%
-    #                               as.character() %>%
-    #                               htmltools::HTML())
-    #          # ,
-             # `Serie de tiempo` =  list(`Serie de tiempo` %>%
-             #                             as.tags() %>%
-             #                             as.character() %>%
-             #                             htmltools::HTML())
-             # )
-  }, escape = FALSE,options = list(
-    fnDrawCallback = htmlwidgets::JS(
-      '
-function(){
-  HTMLWidgets.staticRender();
-}
-'
-    )))
+#   output$tabla_filtrada <- renderDT({
+#     
+#    # browser()
+#     
+#     tibble(
+#       País = "Ecuador",
+#       # Presidentes = list(slickR(imgs))
+#       # ,
+#       # `Serie de tiempo` = list(ggplotly(grafico_serie()$plot))
+#     ) 
+#     # %>% 
+#     #   mutate(Presidentes = list(Presidentes %>%
+#     #                               as.tags() %>%
+#     #                               as.character() %>%
+#     #                               htmltools::HTML())
+#     #          # ,
+#              # `Serie de tiempo` =  list(`Serie de tiempo` %>%
+#              #                             as.tags() %>%
+#              #                             as.character() %>%
+#              #                             htmltools::HTML())
+#              # )
+#   }, escape = FALSE,options = list(
+#     fnDrawCallback = htmlwidgets::JS(
+#       '
+# function(){
+#   HTMLWidgets.staticRender();
+# }
+# '
+#     )))
   
   
   output$serie_de_tiempo <- renderPlotly({
-    
+    grafico_serie()$plot
   })
   
   output[["imgName"]] <- renderText({
