@@ -30,7 +30,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   
-  imgs <- list.files("imagenes/Ecuador/", full.names = TRUE)
+  imgs <- list.files("../imagenes/Ecuador/", full.names = TRUE)
   
   # browser()
   

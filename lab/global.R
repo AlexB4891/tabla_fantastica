@@ -43,7 +43,7 @@ paises <- c("Argentina", "Bolivia", "Brasil",
 
 js <- "
 $(document).ready(function(){
-  var ss = document.getElementById('slickr');
+  var ss = document.getElementById('slick_output');
   // create an observer instance
   var observer = new MutationObserver(function(mutations) {
     var index = $(ss).find('.slick-current').data('slick-index');

@@ -1,11 +1,11 @@
 # Define server logic required to draw a histogram
 server <- function(input, output) {
   
-  imgs <- list.files("~/tabla_fantastica/imagenes/Ecuador/", full.names = TRUE)
+  imgs <- list.files("../imagenes/Ecuador/", full.names = TRUE)
   
   # browser()
   
-  output$slickr <- renderSlickR({
+  output$slick_output <- renderSlickR({
     slickR(imgs)
   })
   
@@ -19,7 +19,4 @@ server <- function(input, output) {
     paste0("CURRENT IMAGE: ", presidente())
   })
   
-  output[["ruta"]] <- renderText({
-    paste0(imgs)
-  })
 }

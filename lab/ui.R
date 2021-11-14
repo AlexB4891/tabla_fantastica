@@ -16,8 +16,7 @@ ui <- fluidPage(
     
     # Show a plot of the generated distribution
     mainPanel(width = 3,
-          textOutput("imgName"),
-          textOutput("ruta")
+          textOutput("imgName")
     )
   )
 )
