@@ -35,20 +35,21 @@ server <- function(input, output) {
     
     tibble(
       País = "Ecuador",
-      Presidentes = list(slickROutput("slick_output"))
+      # Presidentes = list(slickR(imgs))
       # ,
       # `Serie de tiempo` = list(ggplotly(grafico_serie()$plot))
-    ) %>% 
-      mutate(Presidentes = list(Presidentes %>%
-                                  as.tags() %>%
-                                  as.character() %>%
-                                  htmltools::HTML())
-             # ,
+    ) 
+    # %>% 
+    #   mutate(Presidentes = list(Presidentes %>%
+    #                               as.tags() %>%
+    #                               as.character() %>%
+    #                               htmltools::HTML())
+    #          # ,
              # `Serie de tiempo` =  list(`Serie de tiempo` %>%
              #                             as.tags() %>%
              #                             as.character() %>%
              #                             htmltools::HTML())
-             )
+             # )
   }, escape = FALSE,options = list(
     fnDrawCallback = htmlwidgets::JS(
       '

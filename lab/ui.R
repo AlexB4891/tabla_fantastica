@@ -11,7 +11,7 @@ ui <- fluidPage(
   sidebarLayout(
     
     sidebarPanel(
-      # slickROutput("slick_output",width='100%',height='200px'),
+      slickROutput("slick_output",width='100%',height='200px'),
       width = 2
     ),
     
