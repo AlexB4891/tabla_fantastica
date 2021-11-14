@@ -9,22 +9,22 @@ library(jpeg)
 ui <- fluidPage(
   sidebarLayout(
     sidebarPanel(
-      
-      sliderInput(inputId = "plot_num", 
-                  label = "Number of Plots:", 
-                  min = 1, max = 20, value = 5),
-      
-      sliderInput(inputId = "n_obs", 
-                  label = "Number of observations:", 
-                  min = 10, max = 500, value = 100),
-      
-      shiny::radioButtons('slick_type',
-                          label = 'Carousel Type',
-                          choices = c('single','stack','synch'),
-                          selected = 'single',
-                          inline = TRUE),
-      
-      shiny::verbatimTextOutput('current')
+    #   
+    #   sliderInput(inputId = "plot_num", 
+    #               label = "Number of Plots:", 
+    #               min = 1, max = 20, value = 5),
+    #   
+    #   sliderInput(inputId = "n_obs", 
+    #               label = "Number of observations:", 
+    #               min = 10, max = 500, value = 100),
+    #   
+    #   shiny::radioButtons('slick_type',
+    #                       label = 'Carousel Type',
+    #                       choices = c('single','stack','synch'),
+    #                       selected = 'single',
+    #                       inline = TRUE),
+    #   
+    #   shiny::verbatimTextOutput('current')
     ),
     mainPanel(
       
@@ -39,38 +39,38 @@ server <- function(input, output) {
   
   # Create content for the carousel
   
+  plots <- eventReactive(c(input$n_obs,input$plot_num),{
+
+    map(list.files("imagenes/Ecuador/",full.names = T),~{
+
+      # if(str_detect(.x,pattern = "jpg")){
+      #
+      # readJPEG(source = .x)
+      # }else{
+      #
+      # readPNG(source = .x)
+      # }
+
+      # browser()
+
+    OpenImageR::readImage(path = .x) %>%
+        xmlSVG()
+
+    },simplify = FALSE)
+  })
+  
+  
   # plots <- eventReactive(c(input$n_obs,input$plot_num),{
   #   
-  #   map(list.files("imagenes/Ecuador/",full.names = T),~{
+  #   replicate(input$plot_num,{
   #     
-  #     # if(str_detect(.x,pattern = "jpg")){
-  #     # 
-  #     # readJPEG(source = .x)
-  #     # }else{
-  #     #   
-  #     # readPNG(source = .x)
-  #     # }
-  #     
-  #     # browser()
-  #     
-  #   OpenImageR::readImage(path = .x) %>% 
-  #       xmlSVG()
+  #     xmlSVG({hist(rnorm(input$n_obs),
+  #                  col = 'darkgray',
+  #                  border = 'white')},
+  #            standalone=TRUE)
   #     
   #   },simplify = FALSE)
   # })
-  
-  
-  plots <- eventReactive(c(input$n_obs,input$plot_num),{
-    
-    replicate(input$plot_num,{
-      
-      xmlSVG({hist(rnorm(input$n_obs),
-                   col = 'darkgray',
-                   border = 'white')},
-             standalone=TRUE)
-      
-    },simplify = FALSE)
-  })
   
   # renderSlickR (We create the slickR objects here)
   
@@ -137,7 +137,13 @@ server <- function(input, output) {
 shinyApp(ui = ui, server = server)
 
 
-
+bind_rows(Argentina, Bolivia, Brasil, 
+          Chile, Colombia, Costa_Rica, 
+          Cuba, Ecuador, Salvador, 
+          Guatemala, Honduras, Mexico, 
+          Nicaragua, Panama, Paraguay, 
+          Peru, Puerto_Rico, Republica_Dominicana,
+          Uruguay, Venezuela) 
 
 imgs_bare <- lapply(imagenes_ecuador,function(x){
   x <- str_c("https:")
