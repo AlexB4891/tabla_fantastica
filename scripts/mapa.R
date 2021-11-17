@@ -81,8 +81,10 @@ mapa_destinos <-
                  filter(!is.na(Indicador_valor)),
                mapping = aes(group = group,
                              x = long, 
-                             y = lat),
-               colour ="#828070",
+                             y = lat, 
+                             color=Indicador_valor,
+                             alpha = Indicador_valor),
+               # colour ="#828070",
                fill = "#88CDD3",
                show.legend = F,
                size = .3) +
