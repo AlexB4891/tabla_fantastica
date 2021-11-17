@@ -23,15 +23,26 @@ source("scripts/funcion_limpieza_presidentes_ecuador.R", encoding = "UTF-8")
 
 Educacion <- gasto_social_presidente[[2]]
 
+Educacion <- Educacion %>% mutate(pais = case_when(pais=="Brasil"~"Brazil",
+                                      pais=="República Dominicana" ~ "Dominican Republic",
+                                      pais=="Trinidad Y Tabago" ~ "Trinidad and Tobago",
+                                      pais=="Haití" ~ "Haiti",
+                                      pais=="Perú" ~ "Peru",
+                                      pais=="México" ~ "Mexico",
+                                      pais=="Panamá" ~ "Panama",
+                                      TRUE~pais))
+
 # load maps ---------------------------------------------------------------
 
 mapa_datos <- ggplot2::map_data("world", regions = c("Argentina", "Bolivia", "Brazil", 
-                                                     "Chile", "Colombia", "Costa_Rica", 
-                                                     "Cuba", "Ecuador", "Salvador", 
+                                                     "Chile", "Colombia", "Costa Rica", 
+                                                     "Cuba", "Ecuador", "El Salvador", 
                                                      "Guatemala", "Honduras", "Mexico", 
                                                      "Nicaragua", "Panama", "Paraguay", 
-                                                     "Peru", "Puerto_Rico", "Republica_Dominicana",
-                                                     "Uruguay", "Venezuela"))
+                                                     "Peru", "Puerto Rico", "Dominican Republic",
+                                                     "Uruguay", "Venezuela", "Bahamas", "Barbados",
+                                                     "Trinidad and Tobago", "Haiti", "Guyana",
+                                                     "Jamaica"))
 
 
 
@@ -51,46 +62,52 @@ centroides <- mapa$data %>%
   group_by(region) %>%
   summarise_at(.vars = c("long","lat"),list(min = min,max= max),na.rm = T) %>%
   mutate(long = (long_max+long_min)/2,
-         lat = (lat_max+lat_min)/2
-         # ,
-         # long = case_when(region == "Ecuador" ~ -78,
-         #                  region == "Chile" ~ -73,
-         #                  region == "Argentina" ~ -66,
-         #                  TRUE ~ long)
+         lat = (lat_max+lat_min)/2,
+         long = case_when(region == "Ecuador" ~ -78,
+                          region == "Chile" ~ -73,
+                          region == "Argentina" ~ -66,
+                          TRUE ~ long)
          )
 
+mapa_latinoamerica <- function(datos, year, pais){
 
 # Uniendo las bases de centroides con el gasto en Educacion
 
 centroides <- centroides %>%
-  left_join(Educacion,by = c("region" = "pais"))
+  left_join(datos,by = c("region" = "pais"))
 
 
 mapa_datos <-
   mapa_datos %>%
-  left_join(Educacion,by = c("region"="pais"))
+  left_join(datos,by = c("region"="pais"))
 
-# red <- mapa_datos %>%
-#   mutate(label = round(Indicador_valor,2),
-#          label = str_c(region,"\n",label))
+
+mapa_con_filtro <- mapa_datos %>%
+  filter(!is.na(Indicador_valor), Year ==year) %>%
+  mutate(Dummi = if_else(condition = region == pais, true = 1, false = 0)
+         # Dummi = factor(x = Dummi)
+  )
+
+# View(mapa_con_filtro)
 
 mapa_destinos <-
   ggplot() +
   mapa +
-  geom_polygon(data = mapa_datos %>%
-                 filter(!is.na(Indicador_valor)),
+  geom_polygon(data = mapa_con_filtro,
                mapping = aes(group = group,
                              x = long, 
                              y = lat, 
-                             color=Indicador_valor,
-                             alpha = Indicador_valor),
-               # colour ="#828070",
-               fill = "#88CDD3",
-               show.legend = F,
+                             fill=Indicador_valor,
+                             alpha = Dummi
+                             ),
+               colour ="#828070",
+               # fill = "#88CDD3",
+               show.legend = T,
                size = .3) +
   theme_bw() +
  labs(title = "Gasto Social en Educacion en América Latina") +
   scale_size_continuous(range = c(2,10))+
+  scale_alpha(range = c(0.6, 1)) +
   theme(panel.border = element_blank(),
         axis.text = element_blank(),
         axis.title = element_blank(),
@@ -98,3 +115,8 @@ mapa_destinos <-
         panel.grid.minor = element_blank(),
         legend.position = c(0.2,0.3),axis.ticks = element_blank())
 
+return(mapa_destinos)
+
+}
+
+mapa_latinoamerica(datos = Educacion, year = 2014, pais = "Ecuador")
