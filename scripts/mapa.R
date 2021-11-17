@@ -14,14 +14,17 @@ library(igraph)
 library(ggraph)
 library(ggmap)
 library(raster)
+library(ggrepel)
 library(maptools)
 
 
 # Datos: ------------------------------------------------------------------
 
-source("scripts/funcion_limpieza_presidentes_ecuador.R", encoding = "UTF-8")
+# source("scripts/funcion_limpieza_presidentes_ecuador.R", encoding = "UTF-8")
 
-Educacion <- gasto_social_presidente[[2]]
+Educacion <- read_rds("tablas_intermedias/indicador_educación.rds")
+
+# Educacion <- gasto_social_presidente[[2]]
 
 Educacion <- Educacion %>% mutate(pais = case_when(pais=="Brasil"~"Brazil",
                                       pais=="República Dominicana" ~ "Dominican Republic",
@@ -69,12 +72,23 @@ centroides <- mapa$data %>%
                           TRUE ~ long)
          )
 
-mapa_latinoamerica <- function(datos, year, pais){
+mapa_latinoamerica <- function(datos, year, pais_filtro){
 
 # Uniendo las bases de centroides con el gasto en Educacion
 
+datos <- datos %>%
+  filter(!is.na(Indicador_valor), Year ==year) %>%
+  mutate(Dummi = if_else(condition = pais == pais_filtro, true = 1, false = 0)
+         # Dummi = factor(x = Dummi)
+  )
+
+breaks <- quantile(datos$Indicador_valor,probs = c(15,30,45,60,75,90)/100)
+
+labels_b <- scales::dollar(round(breaks,2))
+
 centroides <- centroides %>%
-  left_join(datos,by = c("region" = "pais"))
+  left_join(datos,by = c("region" = "pais")) %>% 
+  mutate(label_pais = str_c(region,"\n",round(Indicador_valor,2)))
 
 
 mapa_datos <-
@@ -82,18 +96,12 @@ mapa_datos <-
   left_join(datos,by = c("region"="pais"))
 
 
-mapa_con_filtro <- mapa_datos %>%
-  filter(!is.na(Indicador_valor), Year ==year) %>%
-  mutate(Dummi = if_else(condition = region == pais, true = 1, false = 0)
-         # Dummi = factor(x = Dummi)
-  )
-
 # View(mapa_con_filtro)
 
 mapa_destinos <-
   ggplot() +
   mapa +
-  geom_polygon(data = mapa_con_filtro,
+  geom_polygon(data = mapa_datos,
                mapping = aes(group = group,
                              x = long, 
                              y = lat, 
@@ -104,19 +112,34 @@ mapa_destinos <-
                # fill = "#88CDD3",
                show.legend = T,
                size = .3) +
-  theme_bw() +
- labs(title = "Gasto Social en Educacion en América Latina") +
+  geom_label_repel(data = centroides,mapping = aes(x = long,
+                                                   y = lat,
+                                                   label = label_pais),
+                   alpha = 0.6, 
+                   color = "#16298A",) +
+  labs(title = "Gasto Social en Educacion en América Latina") +
   scale_size_continuous(range = c(2,10))+
-  scale_alpha(range = c(0.6, 1)) +
+  scale_alpha(range = c(0.6, 1),guide = 'none') +
+  scale_fill_viridis_c(option = "C",
+                       guide = guide_legend(nrow = 1, direction = 'horizontal',
+                                            label.hjust = 0, label.position = 'bottom',
+                                            keywidth = 5.51,
+                                            keyheight = 0.75,
+                                            title = ""),
+                       breaks = as.numeric(breaks),
+                       labels = labels_b)  +
+  theme_bw() +
   theme(panel.border = element_blank(),
         axis.text = element_blank(),
         axis.title = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
-        legend.position = c(0.2,0.3),axis.ticks = element_blank())
+        legend.position = "top",axis.ticks = element_blank())
 
 return(mapa_destinos)
 
 }
+
+plotly::ggplotly(mapa_latinoamerica(datos = Educacion, year = 2014, pais = "Ecuador"))
 
 mapa_latinoamerica(datos = Educacion, year = 2014, pais = "Ecuador")
