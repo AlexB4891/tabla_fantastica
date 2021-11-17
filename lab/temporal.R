@@ -38,8 +38,17 @@ server <- function(input, output) {
     slickR(imgs)
   })
   
+  presidente <- reactive({
+    # browser()
+    # str_remove(
+      imgs[input[["imageIndex"]]]
+    # ,"\\..{3,4}$") %>% 
+    #   str_extract("(?<=\\/\\/).*$")
+  })
+  
+  
   output[["imgName"]] <- renderText({
-    paste0("CURRENT IMAGE: ", basename(imgs[input[["imageIndex"]]]))
+    paste0("CURRENT IMAGE: ", basename(imgs[input[["imageIndex"]]]),"; ",presidente())
   })
   
 }

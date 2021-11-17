@@ -1,6 +1,6 @@
 options(encoding = "UTF-8")
 # Define UI for application that draws a histogram
-ui <- semanticPage(
+ui <- fluidPage(
   tags$head(
     tags$script(HTML(js_ecu))
   ),
@@ -8,18 +8,18 @@ ui <- semanticPage(
   titlePanel("Social Expense Lab"),
   
   # Sidebar with a slider input for number of bins 
-  sidebar_layout(
+  sidebarLayout(
     
-    sidebar_panel(
-      slickROutput("slickEcuador",width='100%',height='200px'),
-      width = 2
+    sidebarPanel(
+      slickROutput("slickEcuador",width='100%',height='200px')
     ),
     
     # Show a plot of the generated distribution
-    main_panel(width = 3,
+    mainPanel(width = 3,
           fluidRow(textOutput("imgName"),
-                   DTOutput("tabla_filtrada")),
-          fluidRow(plotlyOutput("serie_de_tiempo", width='100%'))
+                   plotOutput("serie_de_tiempo"),
+                   DTOutput("tabla_filtrada")
+                   )
     )
   )
 )

@@ -109,6 +109,7 @@ serie_de_tiempo_resaltada <- function(datos,
   tabla_mod <- datos %>% 
     ungroup() %>% 
     dplyr::filter(dplyr::if_any(.cols = dplyr::any_of(names(variable_filtro)), ~.x == unlist(variable_filtro))) %>% 
+    tidyr::fill(names(variables_resaltar),.direction = "down") %>% 
     dplyr::mutate(
       dplyr::across(
         .col = names(variables_resaltar),
@@ -125,15 +126,29 @@ serie_de_tiempo_resaltada <- function(datos,
   limites_ideo <- tabla_mod %>%
     mutate(Year = as.numeric(Year)) %>% 
     fill(ideologia) %>% 
-    arrange(Year) %>% 
-    mutate(indicador_tend = if_else(ideologia != lag(ideologia) | is.na(lag(ideologia)), 1,0)) %>% 
-    filter(indicador_tend == 1,
-           !is.na(ideologia))
-  
+    filter(!is.na(img)) %>% 
+    arrange(Year) 
+  # %>% 
+  #   mutate(indicador_tend = if_else(ideologia != lag(ideologia) | is.na(lag(ideologia)), 1,0)) %>% 
+  #   filter(indicador_tend == 1,
+  #          !is.na(ideologia))
+  # 
   limites_ideo <- limites_ideo %>% 
     mutate(lag_year = lag(Year))
   
   conteo_ideo <- limites_ideo %>% ungroup() %>% summarise(np = n_distinct(ideologia))
+  
+  paleta_colores <- c(Independiente = "#BBB3B3",
+                      Izquierda = "#E32219",
+                      `Centro Izquierda`= "#F37B7B", 
+                      Centro = "#F5EE0A", 
+                      `Centro Derecha` = "#6FA2E0", 
+                      Derecha = "#0471F5")
+  
+  tabla_mod <- tabla_mod %>% 
+    mutate(ind_val = if_else(indicador == 0,NA_real_,!!sym(variable_y)),
+           ind_val2 = if_else(indicador == 1,NA_real_,!!sym(variable_y)))
+
   
   grafico_mod <- ggplot2::ggplot() +
     geom_rect(data = limites_ideo,
@@ -144,16 +159,21 @@ serie_de_tiempo_resaltada <- function(datos,
                             ymin = -Inf,
                             ymax = Inf),alpha = 0.4) +
     ggplot2::geom_line(data = tabla_mod,mapping = ggplot2::aes_string(x = variable_x,
-                                                     y = variable_y,
-                                                     group = "indicador",
-                                                     color = "indicador")) +
+                                                     y = "ind_val"), 
+                       color = "#9c7803"
+                       ) +
     ggplot2::geom_point(data = tabla_mod,mapping = ggplot2::aes_string(x = variable_x,
-                                                      y = variable_y,
-                                                      group = "indicador",
-                                                      color = "indicador"),size = 3) +
-    ggplot2::scale_color_manual(values = c("#FFC300",
-                                           "#581845")) +
-    scale_fill_manual(values = paleta_colores(conteo_ideo$np))
+                                                      y = "ind_val"), 
+                        color = "#9c7803",size = 3) +
+    ggplot2::geom_line(data = tabla_mod,mapping = ggplot2::aes_string(x = variable_x,
+                                                                      y = "ind_val2"),
+                       color = "#581845") +
+    ggplot2::geom_point(data = tabla_mod,mapping = ggplot2::aes_string(x = variable_x,
+                                                                       y = "ind_val2"),
+                        color = "#581845",size = 3) +
+    # ggplot2::scale_color_manual(values = c("#FFC300",
+    #                                        "#581845")) +
+    scale_fill_manual(values = paleta_colores)
   
   resultado <- list(
     tabla = tabla_mod,
