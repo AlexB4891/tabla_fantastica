@@ -5,7 +5,6 @@ paleta_colores <- function(numero){
   
   paleta_n <- paleta(n = numero)
   
-  
   return(paleta_n)
 }
 

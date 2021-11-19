@@ -47,9 +47,6 @@ mapa_datos <- ggplot2::map_data("world", regions = c("Argentina", "Bolivia", "Br
                                                      "Trinidad and Tobago", "Haiti", "Guyana",
                                                      "Jamaica"))
 
-
-
-
 # first map of Brazil -----------------------------------------------------
 
 mapa <- borders("world", regions = c("Argentina", "Bolivia", "Brazil", 

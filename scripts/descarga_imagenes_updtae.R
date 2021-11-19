@@ -77,33 +77,56 @@ extraer_img_presid <- function(url, posicion_tabla){
 }
 
 
+
+c("Argentina", "Bolivia", "Brasil", 
+  "Chile", "Colombia", "Costa Rica", 
+  "Cuba", "Ecuador", "El Salvador",
+  "Guatemala", "Honduras", "México", 
+  "Nicaragua", "Panama", "Paraguay", 
+  "Peru", "Puerto Rico", "Republica Dominicana", 
+  "Uruguay", "Venezuela", "Venezuela") %>% 
+  str_c("imagenes/",.) %>% walk(.f = ~dir.create(.x))
+
+# dir.create("nueva_carpeta")
+
 # Llamar a la base completa de gasto social
 # Gasto_social <- read_rds("tablas_intermedias/indicador_gasto_social.rds")
+
+
 
 funcion_extr_img <- function(base){
   
   imagenes_pais <- base %>%
-    filter(complete.cases(.))
+    filter(!is.na(img))
   
   imagenes_pais %>% 
     transpose() %>% 
     walk(~{
       
-      # nombre del país en cada fila
-      # ext <- .x$pais
+      ext <- str_extract(.x$img,"\\..{3,4}$")
       
       # crear ruta: "imagenes/Pais/Presi.jpg" 
-      dest_file <- str_c("imagenes/Argentina/",.x$nombre_del_presidente, ".jpg")
+      dest_file <- str_c("imagenes/",.x$pais,"/",.x$nombre_del_presidente, ext)
       
-      # browser()
-      
-      # url_file <- .x$img
       
       download.file(url = .x$img, destfile = dest_file, method = "curl")
       
     }) 
 }
 
-funcion_extr_img(base = Argentina)
+# funcion_extr_img(base = Argentina)
+
+
+list(Argentina, Bolivia, Brasil, 
+  Chile, Colombia, Costa_Rica, 
+  Cuba, Ecuador, Salvador, 
+  Guatemala, Honduras, Mexico, 
+  Nicaragua, Panama, Paraguay, 
+  Peru, Puerto_Rico, Republica_Dominicana,
+  Uruguay, Venezuela) %>% walk(.f = ~funcion_extr_img(.x))
+
+
+
+
 
 
