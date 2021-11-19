@@ -76,3 +76,34 @@ extraer_img_presid <- function(url, posicion_tabla){
   return(tabla)
 }
 
+
+# Llamar a la base completa de gasto social
+# Gasto_social <- read_rds("tablas_intermedias/indicador_gasto_social.rds")
+
+funcion_extr_img <- function(base){
+  
+  imagenes_pais <- base %>%
+    filter(complete.cases(.))
+  
+  imagenes_pais %>% 
+    transpose() %>% 
+    walk(~{
+      
+      # nombre del país en cada fila
+      # ext <- .x$pais
+      
+      # crear ruta: "imagenes/Pais/Presi.jpg" 
+      dest_file <- str_c("imagenes/Argentina/",.x$nombre_del_presidente, ".jpg")
+      
+      # browser()
+      
+      # url_file <- .x$img
+      
+      download.file(url = .x$img, destfile = dest_file, method = "curl")
+      
+    }) 
+}
+
+funcion_extr_img(base = Argentina)
+
+
