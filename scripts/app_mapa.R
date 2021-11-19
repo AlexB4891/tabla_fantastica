@@ -120,8 +120,10 @@ mapa_latinoamerica <- function(datos, year, pais_filtro){
 
 
 ui <- semanticPage(
+  title = titlePanel(span(img(src = "hex ergos-01.png", height = 35), "Observatorio del gasto social")),
   sidebar_layout(
     sidebar_panel(
+      h2("Controles:"),
       shiny.semantic::selectInput(inputId = "indicador",
                                   label = "Elige el indicador",
                                   choices = c("Gasto social",
@@ -141,16 +143,26 @@ ui <- semanticPage(
                                               "Nicaragua", "Panama", "Paraguay", 
                                               "Peru", "Puerto Rico", "Republica Dominicana", 
                                               "Uruguay", "Venezuela", "Venezuela")),
-      
+      p("Elige el año de análisis"),
       shiny.semantic::slider_input(input_id = "year", 
+                                   custom_ticks = c(1990,1995,2000,2005,2010,2015,2020) ,
                                    value = 2014, 
                                    min = 1990, 
                                    max = 2019, 
                                    step = 1)
     ),
     main_panel(
-      plotOutput("mapa"),
-      DTOutput("tabla_indicadores")
+      shiny.semantic::tabset(
+        tabs =
+          list(
+            list(menu = "Análisis geografico", content = tagList(plotOutput("mapa",width = "100%")) ,id = "geo_exp"),
+            list(menu = "Tabal de datos", content = tagList(DTOutput("tabla_indicadores")), id = "tab_exp")
+          ),
+        active = "second_tab",
+        id = "exampletabset"
+      )
+      
+      
     )
   )
   
