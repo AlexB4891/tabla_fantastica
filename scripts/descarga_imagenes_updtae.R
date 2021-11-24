@@ -109,7 +109,7 @@ funcion_extr_img <- function(base){
       dest_file <- str_c("imagenes/",.x$pais,"/",.x$nombre_del_presidente, ext)
       
       
-      download.file(url = .x$img, destfile = dest_file, method = "curl")
+      safely(download.file)(url = .x$img, destfile = dest_file, method = "curl")
       
     }) 
 }
@@ -117,13 +117,17 @@ funcion_extr_img <- function(base){
 # funcion_extr_img(base = Argentina)
 
 
-list(Argentina, Bolivia, Brasil, 
-  Chile, Colombia, Costa_Rica, 
-  Cuba, Ecuador, Salvador, 
-  Guatemala, Honduras, Mexico, 
-  Nicaragua, Panama, Paraguay, 
-  Peru, Puerto_Rico, Republica_Dominicana,
-  Uruguay, Venezuela) %>% walk(.f = ~funcion_extr_img(.x))
+# list(Argentina, Bolivia, Brasil, 
+#   Chile, Colombia, Costa_Rica, 
+#   Cuba, Ecuador, Salvador, 
+#   Guatemala, Honduras, Mexico, 
+#   Nicaragua, Panama, Paraguay, 
+#   Peru, Puerto_Rico, Republica_Dominicana,
+#   Uruguay, Venezuela) %>% 
+  
+read_rds("~/tabla_fantastica/tablas_intermedias/indicador_gasto_social.rds") %>% 
+  split(.$pais) %>% 
+  walk(.f = ~funcion_extr_img(.x))
 
 
 
